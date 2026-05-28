@@ -2,558 +2,852 @@
 <html lang="kk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Қауіпсіздік жүйесі</title>
     <style>
+        :root {
+            --bg: #000000;
+            --surface: #0D0D0D;
+            --text: #FFFFFF;
+            --green: #00FF41;
+            --red: #FF3333;
+            --yellow: #FFD60A;
+            --cyan: #64D2FF;
+            --gray: #8E8E93;
+            --dark-gray: #1C1C1E;
+            --border: #2C2C2E;
+            --font-mono: 'SF Mono', 'Menlo', 'Courier New', monospace;
+            --font-system: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         body {
-            background: #000;
-            font-family: 'Courier New', 'Menlo', monospace;
+            background: var(--bg);
+            font-family: var(--font-mono);
             height: 100vh;
+            height: 100dvh;
             width: 100vw;
             overflow: hidden;
-            user-select: none;
-            -webkit-user-select: none;
-            color: #0f0;
+            color: var(--green);
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* ОСНОВНОЙ ЭКРАН */
-        .main {
+        /* ==================== MAIN TERMINAL ==================== */
+        .terminal-container {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: #000;
+            background: var(--bg);
             display: flex;
             flex-direction: column;
-            padding: 20px;
-            overflow-y: auto;
+            z-index: 1;
         }
 
-        /* ТЕКСТ ВЗЛОМА */
-        .log {
+        .terminal-header {
+            background: var(--surface);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .terminal-dot {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+        }
+        .terminal-dot.red { background: #FF5F57; }
+        .terminal-dot.yellow { background: #FFBD2E; }
+        .terminal-dot.green { background: #28C840; }
+
+        .terminal-title {
             flex: 1;
-            font-size: 13px;
-            line-height: 1.9;
+            text-align: center;
+            font-size: 12px;
+            color: var(--gray);
+            font-family: var(--font-system);
+            letter-spacing: 0.5px;
+        }
+
+        .terminal-body {
+            flex: 1;
+            padding: 16px;
             overflow-y: auto;
-            white-space: pre-wrap;
+            overflow-x: hidden;
+            font-size: 13px;
+            line-height: 1.8;
             word-break: break-all;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
         }
 
-        .log .red { color: #ff3333; }
-        .log .yellow { color: #ffcc00; }
-        .log .cyan { color: #00d4ff; }
-        .log .gray { color: #666; }
-        .log .white { color: #fff; }
-        .log .green { color: #0f0; }
+        .terminal-body::-webkit-scrollbar { width: 3px; }
+        .terminal-body::-webkit-scrollbar-track { background: transparent; }
+        .terminal-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-        .cursor {
+        .line { animation: fadeIn 0.08s ease forwards; opacity: 0; }
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        .line .red { color: var(--red); }
+        .line .yellow { color: var(--yellow); }
+        .line .cyan { color: var(--cyan); }
+        .line .gray { color: var(--gray); }
+        .line .white { color: var(--text); }
+        .line .green { color: var(--green); }
+
+        .cursor-inline {
             display: inline-block;
-            width: 8px;
-            height: 15px;
-            background: #0f0;
-            animation: blink 1s infinite;
+            width: 7px; height: 14px;
+            background: var(--green);
+            animation: cursorBlink 1s step-end infinite;
             vertical-align: middle;
-            margin-left: 4px;
+            margin-left: 2px;
+        }
+        @keyframes cursorBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
         }
 
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0; }
+        /* ==================== PROGRESS BAR ==================== */
+        .progress-container {
+            flex-shrink: 0;
+            padding: 0 16px 8px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        .progress-container.visible { opacity: 1; }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: var(--gray);
+            margin-bottom: 4px;
+            font-family: var(--font-system);
         }
 
-        /* ОКНО ВВОДА КОДА */
-        .code-overlay {
+        .progress-track {
+            height: 3px;
+            background: var(--dark-gray);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--red);
+            width: 0%;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 2px;
+        }
+
+        /* ==================== MODAL OVERLAY ==================== */
+        .modal-overlay {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0,0,0,0.92);
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             z-index: 100;
             display: none;
             align-items: center;
             justify-content: center;
-            flex-direction: column;
+            animation: overlayIn 0.3s ease;
         }
+        .modal-overlay.active { display: flex; }
+        @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .code-overlay.active {
-            display: flex;
-        }
-
-        .code-box {
-            background: #0a0a0a;
-            border: 2px solid #ff3333;
-            border-radius: 10px;
-            padding: 30px 20px;
+        .modal-dialog {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            width: 88%;
+            max-width: 360px;
+            padding: 28px 24px 20px;
             text-align: center;
-            width: 85%;
-            max-width: 350px;
-            box-shadow: 0 0 40px rgba(255,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            animation: dialogIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes dialogIn {
+            from { transform: scale(0.9) translateY(20px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
         }
 
-        .code-box.success {
-            border-color: #0f0;
-            box-shadow: 0 0 40px rgba(0,255,0,0.3);
+        .modal-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            display: block;
         }
 
-        .code-title {
-            color: #ff3333;
+        .modal-title {
+            font-family: var(--font-system);
             font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 8px;
-            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            color: var(--red);
+            margin-bottom: 6px;
+            letter-spacing: -0.3px;
         }
+        .modal-title.success { color: var(--green); }
 
-        .code-box.success .code-title {
-            color: #0f0;
-        }
-
-        .code-subtitle {
-            color: #999;
+        .modal-subtitle {
+            font-family: var(--font-system);
             font-size: 13px;
+            color: var(--gray);
             margin-bottom: 20px;
-            font-family: 'Courier New', monospace;
+            line-height: 1.4;
         }
 
-        .code-attempts {
-            color: #ffcc00;
+        .modal-attempts {
+            font-family: var(--font-system);
             font-size: 14px;
-            margin-bottom: 15px;
-            font-family: 'Courier New', monospace;
+            color: var(--yellow);
+            margin-bottom: 16px;
+            font-weight: 500;
         }
 
-        .code-input {
-            background: #000;
-            border: 1px solid #ff3333;
-            color: #0f0;
-            font-size: 24px;
-            padding: 12px;
-            text-align: center;
+        .modal-input-wrap {
+            position: relative;
+            margin-bottom: 14px;
+        }
+
+        .modal-input {
             width: 100%;
-            border-radius: 5px;
-            font-family: 'Courier New', monospace;
-            letter-spacing: 8px;
+            background: var(--bg);
+            border: 2px solid var(--red);
+            color: var(--green);
+            font-family: var(--font-mono);
+            font-size: 28px;
+            padding: 14px 10px;
+            text-align: center;
+            border-radius: 12px;
+            letter-spacing: 10px;
             outline: none;
-            caret-color: #0f0;
+            caret-color: var(--green);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
-
-        .code-input::placeholder {
+        .modal-input:focus {
+            border-color: var(--red);
+            box-shadow: 0 0 20px rgba(255,51,51,0.3);
+        }
+        .modal-input.success-input {
+            border-color: var(--green);
+            box-shadow: 0 0 20px rgba(0,255,65,0.3);
+        }
+        .modal-input::placeholder {
             color: #333;
             letter-spacing: 2px;
             font-size: 14px;
         }
 
-        .code-box.success .code-input {
-            border-color: #0f0;
+        .modal-error {
+            font-family: var(--font-system);
+            font-size: 12px;
+            color: var(--red);
+            margin-top: 8px;
+            min-height: 18px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
         }
+        .modal-error.show { opacity: 1; }
 
-        .code-btn {
-            background: #ff3333;
-            color: #fff;
-            border: none;
-            padding: 12px;
+        .modal-btn {
             width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-family: var(--font-system);
             font-size: 16px;
-            font-weight: bold;
-            border-radius: 5px;
-            margin-top: 12px;
+            font-weight: 600;
             cursor: pointer;
-            font-family: 'Courier New', monospace;
-            letter-spacing: 2px;
-            transition: background 0.2s;
+            transition: all 0.2s ease;
+            background: var(--red);
+            color: #fff;
+            letter-spacing: 1px;
         }
-
-        .code-btn:active {
-            background: #cc0000;
-        }
-
-        .code-box.success .code-btn {
-            background: #0f0;
+        .modal-btn:active { transform: scale(0.97); opacity: 0.9; }
+        .modal-btn.success-btn {
+            background: var(--green);
             color: #000;
         }
 
-        .code-error {
-            color: #ff3333;
-            font-size: 12px;
-            margin-top: 8px;
-            display: none;
-            font-family: 'Courier New', monospace;
-        }
-
-        .code-error.show {
-            display: block;
-        }
-
-        /* КРАСНАЯ ВСПЫШКА */
-        .flash {
+        /* ==================== RED FLASH ==================== */
+        .red-flash {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(255,0,0,0.2);
+            background: rgba(255,0,0,0.25);
             z-index: 200;
             pointer-events: none;
             opacity: 0;
-            transition: opacity 0.1s;
+            transition: opacity 0.1s ease;
         }
+        .red-flash.fire { opacity: 1; }
 
-        .flash.on {
-            opacity: 1;
+        /* ==================== STATUS BAR ==================== */
+        .status-bar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 28px;
+            background: var(--surface);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-family: var(--font-system);
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text);
+            z-index: 50;
+            border-bottom: 1px solid var(--border);
         }
-
-        /* ПРОГРЕСС БАР */
-        .progress-wrap {
-            width: 100%;
-            height: 3px;
-            background: #1a1a1a;
-            margin-top: 10px;
-            border-radius: 2px;
-            overflow: hidden;
-            display: none;
-        }
-
-        .progress-wrap.show {
-            display: block;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: #ff3333;
-            width: 0%;
-            transition: width 0.3s;
-        }
+        .status-right { display: flex; gap: 6px; align-items: center; }
     </style>
 </head>
 <body>
 
-    <!-- КРАСНАЯ ВСПЫШКА -->
-    <div class="flash" id="flash"></div>
+    <!-- STATUS BAR -->
+    <div class="status-bar">
+        <span id="timeDisplay">9:41</span>
+        <span class="status-right">
+            <span>5G</span>
+            <span>Beeline</span>
+            <span>▮▮▮▮</span>
+            <span>🔋 87%</span>
+        </span>
+    </div>
 
-    <!-- ОСНОВНОЙ ЭКРАН -->
-    <div class="main" id="main">
-        <div class="log" id="logBox"></div>
-        <div class="progress-wrap" id="progressWrap">
-            <div class="progress-fill" id="progressFill"></div>
+    <!-- RED FLASH -->
+    <div class="red-flash" id="redFlash"></div>
+
+    <!-- TERMINAL -->
+    <div class="terminal-container" style="top: 28px;">
+        <div class="terminal-header">
+            <span class="terminal-dot red"></span>
+            <span class="terminal-dot yellow"></span>
+            <span class="terminal-dot green"></span>
+            <span class="terminal-title">terminal — root@device — 80×24</span>
+        </div>
+        <div class="terminal-body" id="terminalBody"></div>
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-label">
+                <span>ДЕРЕКТЕРДІ ЖІБЕРУ</span>
+                <span id="progressPercent">0%</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
         </div>
     </div>
 
-    <!-- ОКНО ВВОДА КОДА -->
-    <div class="code-overlay" id="codeOverlay">
-        <div class="code-box" id="codeBox">
-            <div class="code-title" id="codeTitle">⚠️ ҚАУІПСІЗДІК КОДЫ</div>
-            <div class="code-subtitle">Жүйені тоқтату үшін кодты енгізіңіз</div>
-            <div class="code-attempts" id="codeAttempts">Қалған әрекет: 3</div>
-            <input type="text" class="code-input" id="codeInput" placeholder="******" maxlength="6" inputmode="numeric" autocomplete="off">
-            <button class="code-btn" id="codeBtn" onclick="checkCode()">РАСТАУ</button>
-            <div class="code-error" id="codeError">Қате код! Қайтадан енгізіңіз.</div>
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-dialog" id="modalDialog">
+            <span class="modal-icon" id="modalIcon">🔐</span>
+            <div class="modal-title" id="modalTitle">ҚАУІПСІЗДІК КОДЫ</div>
+            <div class="modal-subtitle" id="modalSubtitle">Жүйені тоқтату үшін 6 таңбалы кодты енгізіңіз</div>
+            <div class="modal-attempts" id="modalAttempts">Қалған әрекет: 3</div>
+            <div class="modal-input-wrap">
+                <input type="text" class="modal-input" id="modalInput" placeholder="******" maxlength="6" inputmode="numeric" autocomplete="off" pattern="[0-9]*">
+            </div>
+            <div class="modal-error" id="modalError">Қате код! Әрекет қалды: 2</div>
+            <button class="modal-btn" id="modalBtn">РАСТАУ</button>
         </div>
     </div>
 
     <script>
-        // ============ ПЕРЕМЕННЫЕ ============
-        const logBox = document.getElementById('logBox');
-        const codeOverlay = document.getElementById('codeOverlay');
-        const codeBox = document.getElementById('codeBox');
-        const codeTitle = document.getElementById('codeTitle');
-        const codeAttempts = document.getElementById('codeAttempts');
-        const codeInput = document.getElementById('codeInput');
-        const codeBtn = document.getElementById('codeBtn');
-        const codeError = document.getElementById('codeError');
-        const flash = document.getElementById('flash');
-        const progressWrap = document.getElementById('progressWrap');
-        const progressFill = document.getElementById('progressFill');
+        (function() {
+            'use strict';
 
-        const CORRECT_CODE = '713702';
-        let attemptsLeft = 3;
-        let hackStopped = false;
-        let hackInterval = null;
+            // ==================== DOM REFERENCES ====================
+            const $ = (sel) => document.querySelector(sel);
+            const terminalBody = $('#terminalBody');
+            const modalOverlay = $('#modalOverlay');
+            const modalDialog = $('#modalDialog');
+            const modalIcon = $('#modalIcon');
+            const modalTitle = $('#modalTitle');
+            const modalSubtitle = $('#modalSubtitle');
+            const modalAttempts = $('#modalAttempts');
+            const modalInput = $('#modalInput');
+            const modalError = $('#modalError');
+            const modalBtn = $('#modalBtn');
+            const redFlash = $('#redFlash');
+            const progressContainer = $('#progressContainer');
+            const progressFill = $('#progressFill');
+            const progressPercent = $('#progressPercent');
+            const timeDisplay = $('#timeDisplay');
 
-        // ============ АУДИО ============
-        let audioCtx = null;
-        function initAudio() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
+            // ==================== CONSTANTS ====================
+            const CORRECT_CODE = '713702';
+            const MAX_ATTEMPTS = 3;
+            const COUNTDOWN_SECONDS = 15;
 
-        function beep(freq, dur, type = 'square', vol = 0.03) {
-            if (!audioCtx) return;
-            try {
-                const o = audioCtx.createOscillator();
-                const g = audioCtx.createGain();
-                o.type = type; o.frequency.value = freq; g.gain.value = vol;
-                o.connect(g); g.connect(audioCtx.destination);
-                o.start(); o.stop(audioCtx.currentTime + dur / 1000);
-            } catch(e) {}
-        }
+            // ==================== STATE ====================
+            let attemptsLeft = MAX_ATTEMPTS;
+            let isHackStopped = false;
+            let countdownTimer = null;
+            let modalTimeout = null;
+            let hackIntervalId = null;
+            let audioCtx = null;
 
-        function soundTyping() { beep(1000 + Math.random() * 300, 20, 'square', 0.02); }
-        function soundAlert() { beep(800, 100, 'sawtooth', 0.06); setTimeout(() => beep(1000, 120, 'sawtooth', 0.06), 100); }
-        function soundError() { beep(200, 300, 'sawtooth', 0.1); }
-        function soundSuccess() { beep(800, 80, 'sine', 0.05); setTimeout(() => beep(1200, 100, 'sine', 0.05), 80); }
-
-        function vibrate(p) { if (navigator.vibrate) navigator.vibrate(p); }
-
-        // ============ ВСПЫШКА ============
-        function doFlash() {
-            flash.classList.add('on');
-            setTimeout(() => flash.classList.remove('on'), 150);
-        }
-
-        // ============ ЛОГ ============
-        function addLog(text, cls = '') {
-            if (hackStopped) return;
-            const span = document.createElement('span');
-            span.className = cls;
-            span.textContent = text;
-            logBox.appendChild(span);
-            logBox.scrollTop = logBox.scrollHeight;
-            soundTyping();
-        }
-
-        function addLine(text, cls = '') {
-            addLog(text + '\n', cls);
-        }
-
-        // ============ ПОКАЗАТЬ ОКНО ВВОДА ============
-        function showCodeWindow() {
-            codeOverlay.classList.add('active');
-            codeInput.value = '';
-            codeError.classList.remove('show');
-            codeBox.classList.remove('success');
-            codeTitle.textContent = '⚠️ ҚАУІПСІЗДІК КОДЫ';
-            codeBtn.textContent = 'РАСТАУ';
-            codeAttempts.textContent = `Қалған әрекет: ${attemptsLeft}`;
-            codeInput.focus();
-        }
-
-        // ============ ПРОВЕРКА КОДА ============
-        function checkCode() {
-            const entered = codeInput.value.trim();
-
-            if (entered === CORRECT_CODE) {
-                // ПРАВИЛЬНЫЙ КОД - ОСТАНОВКА
-                hackStopped = true;
-                if (hackInterval) clearInterval(hackInterval);
-                
-                codeBox.classList.add('success');
-                codeTitle.textContent = '✅ КОД ДҰРЫС';
-                codeAttempts.textContent = 'Жүйе қалпына келтірілді';
-                codeAttempts.style.color = '#0f0';
-                codeBtn.textContent = 'ЖАБУ';
-                codeBtn.style.background = '#0f0';
-                codeBtn.style.color = '#000';
-                codeBtn.onclick = function() {
-                    codeOverlay.classList.remove('active');
-                };
-                codeError.classList.remove('show');
-                codeInput.disabled = true;
-                
-                addLine('');
-                addLine('═══════════════════════════════', 'green');
-                addLine('ҚАУІПСІЗДІК КОДЫ ҚАБЫЛДАНДЫ', 'green');
-                addLine('ЖҮЙЕ ТОҚТАТЫЛДЫ', 'green');
-                addLine('БАРЛЫҚ ПРОЦЕСТЕР ЖОЙЫЛДЫ', 'green');
-                addLine('ҚҰРЫЛҒЫ ҚАУІПСІЗ', 'green');
-                addLine('═══════════════════════════════', 'green');
-                
-                soundSuccess();
-                vibrate([50]);
-
-            } else {
-                // НЕПРАВИЛЬНЫЙ КОД
-                attemptsLeft--;
-                codeError.classList.add('show');
-                codeInput.value = '';
-                codeInput.focus();
-                
-                soundError();
-                vibrate([100, 50, 100]);
-                doFlash();
-
-                if (attemptsLeft > 0) {
-                    codeAttempts.textContent = `Қалған әрекет: ${attemptsLeft}`;
-                    codeError.textContent = `Қате код! ${attemptsLeft} әрекет қалды.`;
-                } else {
-                    // КОНЧИЛИСЬ ПОПЫТКИ
-                    codeOverlay.classList.remove('active');
-                    addLine('');
-                    addLine('═══════════════════════════════', 'red');
-                    addLine('БАРЛЫҚ ӘРЕКЕТ СӘТСІЗ АЯҚТАЛДЫ', 'red');
-                    addLine('ЖҮЙЕНІ ТОҚТАТУ МҮМКІН ЕМЕС', 'red');
-                    addLine('ДЕРЕКТЕРДІ ЖОЮ ЖАЛҒАСУДА...', 'red');
-                    addLine('═══════════════════════════════', 'red');
-                    
-                    progressWrap.classList.add('show');
-                    progressFill.style.width = '60%';
-                    
-                    // Продолжаем взлом агрессивнее
-                    setTimeout(continueHack, 1000);
-                }
-            }
-        }
-
-        // Ввод по Enter
-        codeInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                checkCode();
-            }
-        });
-
-        // ============ ПРОДОЛЖЕНИЕ ВЗЛОМА ПОСЛЕ НЕУДАЧИ ============
-        function continueHack() {
-            progressFill.style.width = '80%';
-            
-            addLine('ҚАУІПСІЗДІК ЖҮЙЕСІ ӨШІРІЛДІ', 'red');
-            addLine('БРАНДМАУЭР АЙНАЛЫП ӨТІЛДІ', 'red');
-            addLine('');
-            
-            const finalData = [
-                '📁 /sdcard/DCIM/ -> 2347 файл жүктелді',
-                '📁 /data/contacts/ -> 156 байланыс',
-                '📁 WhatsApp/ -> 23450 хабарлама',
-                '📁 Telegram/ -> 8920 хабарлама',
-                '💳 Kaspi Gold ****4732 -> 2 847 560 ₸',
-                '💳 Halyk Bank ****8801 -> 1 230 000 ₸',
-                '📍 Геолокация: Алматы, Абая 45',
-                '📱 IMEI: 358273104928471',
-                '📞 +7 705 823 45 67',
-                '📞 +7 701 456 78 90',
-                '📞 +7 702 345 67 89',
-            ];
-
-            finalData.forEach((item, i) => {
-                setTimeout(() => {
-                    if (!hackStopped) {
-                        addLine(`  ├─ ${item}`, 'red');
+            // ==================== AUDIO ENGINE ====================
+            const AudioEngine = {
+                init() {
+                    if (!audioCtx) {
+                        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     }
-                }, i * 300);
-            });
+                },
 
-            setTimeout(() => {
-                if (!hackStopped) {
-                    progressFill.style.width = '100%';
-                    addLine('  └─ БАРЛЫҚ ДЕРЕКТЕР ЖІБЕРІЛДІ', 'red');
-                    addLine('');
-                    addLine('⚠️ ҚҰРЫЛҒЫ ТОЛЫҒЫМЕН БҰЗЫЛДЫ ⚠️', 'red');
-                    addLine('СЕРВЕР: 185.117.153.79:9050 (TOR)', 'red');
-                    addLine('');
-                    
-                    hackInterval = setInterval(() => {
-                        if (!hackStopped) {
-                            addLine('█', 'red');
-                        }
-                    }, 200);
+                play(freq, duration, type = 'square', volume = 0.03) {
+                    if (!audioCtx) return;
+                    try {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = type;
+                        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                        gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration / 1000);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(audioCtx.currentTime);
+                        osc.stop(audioCtx.currentTime + duration / 1000);
+                    } catch (e) { /* silent */ }
+                },
+
+                typing() { this.play(1000 + Math.random() * 400, 15, 'square', 0.015); },
+                alert() { this.play(800, 80, 'sawtooth', 0.05); setTimeout(() => this.play(1000, 100, 'sawtooth', 0.05), 80); },
+                error() { this.play(180, 250, 'sawtooth', 0.08); },
+                success() { this.play(800, 60, 'sine', 0.04); setTimeout(() => this.play(1200, 80, 'sine', 0.04), 60); },
+                critical() { this.play(150, 400, 'sawtooth', 0.12); }
+            };
+
+            // ==================== HAPTICS ====================
+            const Haptics = {
+                light() { if (navigator.vibrate) navigator.vibrate(15); },
+                medium() { if (navigator.vibrate) navigator.vibrate([30, 20, 30]); },
+                heavy() { if (navigator.vibrate) navigator.vibrate([80, 40, 80]); },
+                critical() { if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]); }
+            };
+
+            // ==================== VISUAL EFFECTS ====================
+            const VFX = {
+                flash() {
+                    redFlash.classList.add('fire');
+                    setTimeout(() => redFlash.classList.remove('fire'), 120);
+                },
+
+                shake(element) {
+                    element.style.transition = 'transform 0.1s ease';
+                    element.style.transform = 'translateX(-5px)';
+                    setTimeout(() => { element.style.transform = 'translateX(5px)'; }, 50);
+                    setTimeout(() => { element.style.transform = 'translateX(-3px)'; }, 100);
+                    setTimeout(() => { element.style.transform = 'translateX(0)'; }, 150);
                 }
-            }, finalData.length * 300 + 500);
-        }
+            };
 
-        // ============ ЗАПУСК ============
-        async function startHack() {
-            initAudio();
+            // ==================== TERMINAL ====================
+            const Terminal = {
+                write(text, className = '') {
+                    if (isHackStopped) return;
+                    const div = document.createElement('div');
+                    div.className = 'line';
+                    if (className) {
+                        div.innerHTML = `<span class="${className}">${text}</span>`;
+                    } else {
+                        div.textContent = text;
+                    }
+                    terminalBody.appendChild(div);
+                    terminalBody.scrollTop = terminalBody.scrollHeight;
+                    AudioEngine.typing();
+                },
 
-            // Фаза 1: Подключение
-            addLine('', '');
-            addLine('╔══════════════════════════════════════╗', 'red');
-            addLine('║   ҚАУІПСІЗДІК ЖҮЙЕСІН ТЕКСЕРУ       ║', 'red');
-            addLine('╚══════════════════════════════════════╝', 'red');
-            await sleep(800);
+                writeLine(text, className = '') {
+                    this.write(text, className);
+                },
 
-            addLine('', '');
-            addLine('[•] Құрылғыға қосылу...', 'yellow');
-            await sleep(600);
-            addLine('[✓] Қосылу сәтті', 'green');
-            addLine('[•] IP: 192.168.1.107', 'gray');
-            addLine('[•] MAC: AA:BB:CC:DD:EE:FF', 'gray');
-            await sleep(500);
+                writeEmpty() {
+                    this.write('');
+                },
 
-            addLine('[•] Құрылғы туралы ақпарат жинау...', 'yellow');
-            await sleep(600);
-            addLine('[i] Модель: iPhone 16 Pro Max', 'cyan');
-            addLine('[i] iOS: 18.3.1', 'cyan');
-            addLine('[i] IMEI: 358273104928471', 'cyan');
-            await sleep(500);
+                writeBanner(text, className = 'red') {
+                    const border = '═'.repeat(44);
+                    this.writeLine(`╔${border}╗`, className);
+                    this.writeLine(`║  ${text.padEnd(42)}║`, className);
+                    this.writeLine(`╚${border}╝`, className);
+                },
 
-            addLine('[•] Желі ақпараты...', 'yellow');
-            await sleep(400);
-            addLine('[i] Оператор: Beeline KZ', 'cyan');
-            addLine('[i] Нөмір: +7 705 823 45 67', 'cyan');
-            addLine('[i] 5G қосылған', 'cyan');
-            await sleep(500);
+                async typeSequence(items, delay = 300) {
+                    for (const item of items) {
+                        if (isHackStopped) break;
+                        this.writeLine(item.text, item.className || '');
+                        await Utils.sleep(delay);
+                    }
+                }
+            };
 
-            // Фаза 2: Сканирование
-            addLine('', '');
-            addLine('[►] ЖҮЙЕНІ СКАНЕРЛЕУ БАСТАЛДЫ', 'yellow');
-            await sleep(400);
+            // ==================== UTILS ====================
+            const Utils = {
+                sleep(ms) {
+                    return new Promise(resolve => setTimeout(resolve, ms));
+                },
 
-            const scanItems = [
-                'Байланыстар дерекқоры... 156 жазба',
-                'Хабарламалар... 2 340 SMS',
-                'WhatsApp чаттары... 23 450 хабарлама',
-                'Telegram чаттары... 8 920 хабарлама',
-                'Галерея... 2 347 фото және видео',
-                'Құжаттар... 89 PDF файл',
-                'Kaspi.kz қосымшасы... сессия белсенді',
-                'Halyk Homebank... токен алынды',
-            ];
+                updateClock() {
+                    const now = new Date();
+                    timeDisplay.textContent = now.toLocaleTimeString('ru-RU', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false
+                    });
+                },
 
-            for (const item of scanItems) {
-                if (hackStopped) return;
-                await sleep(350);
-                addLine(`  ├─ ${item}`, 'gray');
+                setProgress(percent) {
+                    progressFill.style.width = percent + '%';
+                    progressPercent.textContent = percent + '%';
+                }
+            };
+
+            // ==================== MODAL ====================
+            const Modal = {
+                show() {
+                    modalOverlay.classList.add('active');
+                    modalInput.value = '';
+                    modalError.classList.remove('show');
+                    modalInput.className = 'modal-input';
+                    modalDialog.style.transform = '';
+                    modalInput.focus();
+                    this.updateAttempts();
+                    this.startCountdown();
+                },
+
+                hide() {
+                    modalOverlay.classList.remove('active');
+                    this.clearCountdown();
+                },
+
+                updateAttempts() {
+                    modalAttempts.textContent = `Қалған әрекет: ${attemptsLeft}`;
+                    if (attemptsLeft <= 1) {
+                        modalAttempts.style.color = '#FF3333';
+                    } else {
+                        modalAttempts.style.color = '#FFD60A';
+                    }
+                },
+
+                showError(message) {
+                    modalError.textContent = message;
+                    modalError.classList.add('show');
+                    VFX.shake(modalDialog);
+                },
+
+                showSuccess() {
+                    modalIcon.textContent = '✅';
+                    modalTitle.textContent = 'КОД ДҰРЫС';
+                    modalTitle.className = 'modal-title success';
+                    modalSubtitle.textContent = 'Жүйе сәтті тоқтатылды. Құрылғы қауіпсіз.';
+                    modalAttempts.textContent = '';
+                    modalInput.className = 'modal-input success-input';
+                    modalInput.disabled = true;
+                    modalError.classList.remove('show');
+                    modalBtn.textContent = 'ЖАБУ';
+                    modalBtn.className = 'modal-btn success-btn';
+                    this.clearCountdown();
+                },
+
+                startCountdown() {
+                    this.clearCountdown();
+                    let secondsLeft = COUNTDOWN_SECONDS;
+
+                    countdownTimer = setInterval(() => {
+                        if (isHackStopped) {
+                            this.clearCountdown();
+                            return;
+                        }
+                        secondsLeft--;
+                        if (secondsLeft <= 0) {
+                            this.clearCountdown();
+                            this.handleTimeout();
+                        } else if (secondsLeft <= 5) {
+                            modalSubtitle.textContent = `Кодты енгізуге ${secondsLeft} секунд қалды...`;
+                            modalSubtitle.style.color = '#FF3333';
+                        }
+                    }, 1000);
+                },
+
+                clearCountdown() {
+                    if (countdownTimer) {
+                        clearInterval(countdownTimer);
+                        countdownTimer = null;
+                    }
+                    modalSubtitle.style.color = '#8E8E93';
+                    modalSubtitle.textContent = 'Жүйені тоқтату үшін 6 таңбалы кодты енгізіңіз';
+                },
+
+                handleTimeout() {
+                    // Timeout = wrong attempt
+                    modalInput.value = '000000';
+                    this.submitCode();
+                },
+
+                submitCode() {
+                    if (isHackStopped) return;
+
+                    const code = modalInput.value.trim();
+
+                    if (code === CORRECT_CODE) {
+                        // SUCCESS
+                        isHackStopped = true;
+                        this.clearCountdown();
+                        AudioEngine.success();
+                        Haptics.light();
+                        this.showSuccess();
+                        Terminal.writeEmpty();
+                        Terminal.writeBanner('✅ ЖҮЙЕ ТОҚТАТЫЛДЫ', 'green');
+                        Terminal.writeLine('Қауіпсіздік коды дұрыс енгізілді.', 'green');
+                        Terminal.writeLine('Барлық зиянды процестер жойылды.', 'green');
+                        Terminal.writeLine('Құрылғы қорғалған күйде.', 'green');
+
+                        if (hackIntervalId) clearInterval(hackIntervalId);
+                        progressContainer.classList.remove('visible');
+
+                    } else {
+                        // FAIL
+                        attemptsLeft--;
+                        AudioEngine.error();
+                        Haptics.heavy();
+                        VFX.flash();
+
+                        if (attemptsLeft > 0) {
+                            this.showError(`Қате код! ${attemptsLeft} әрекет қалды.`);
+                            this.updateAttempts();
+                            modalInput.value = '';
+                            modalInput.focus();
+                        } else {
+                            // NO ATTEMPTS LEFT
+                            this.hide();
+                            Terminal.writeEmpty();
+                            Terminal.writeBanner('⛔ БАРЛЫҚ ӘРЕКЕТ СӘТСІЗ', 'red');
+                            Terminal.writeLine('Қауіпсіздік жүйесі өшірілді.', 'red');
+                            Terminal.writeLine('Деректерді жою басталды...', 'red');
+                            progressContainer.classList.add('visible');
+                            Utils.setProgress(60);
+                            this.clearCountdown();
+                            AttackPhase.continueAfterFail();
+                        }
+                    }
+                }
+            };
+
+            // ==================== ATTACK PHASES ====================
+            const AttackPhase = {
+                async phase1_Connect() {
+                    Terminal.writeEmpty();
+                    Terminal.writeBanner('ҚАУІПСІЗДІК ЖҮЙЕСІН ТЕКСЕРУ');
+
+                    await Utils.sleep(600);
+
+                    await Terminal.typeSequence([
+                        { text: '[•] Құрылғыға қосылу...', className: 'yellow' },
+                        { text: '[✓] Қосылу сәтті (SSH over 5G)', className: 'green' },
+                        { text: '[i] IP: 37.151.214.89', className: 'gray' },
+                        { text: '[i] MAC: AA:BB:CC:11:22:33', className: 'gray' },
+                        { text: '[i] Порт: 4422', className: 'gray' },
+                    ], 350);
+
+                    await Utils.sleep(400);
+
+                    await Terminal.typeSequence([
+                        { text: '[•] Құрылғы ақпараты...', className: 'yellow' },
+                        { text: '[i] Модель: iPhone 16 Pro Max', className: 'cyan' },
+                        { text: '[i] iOS нұсқасы: 18.3.1 (22D72)', className: 'cyan' },
+                        { text: '[i] IMEI: 358273104928471', className: 'cyan' },
+                        { text: '[i] Сериялық нөмір: F4LXP2N8RJ', className: 'cyan' },
+                    ], 300);
+                },
+
+                async phase2_Network() {
+                    await Utils.sleep(300);
+
+                    await Terminal.typeSequence([
+                        { text: '[•] Желілік ақпарат...', className: 'yellow' },
+                        { text: '[i] Оператор: Beeline Kazakhstan (40101)', className: 'cyan' },
+                        { text: '[i] Нөмір: +7 705 823 45 67', className: 'cyan' },
+                        { text: '[i] 5G NSA: Қосылған', className: 'cyan' },
+                        { text: '[i] Wi-Fi: TP-Link_Home_5G', className: 'cyan' },
+                        { text: '[i] Bluetooth: AirPods Pro (қосылған)', className: 'cyan' },
+                    ], 280);
+                },
+
+                async phase3_Scan() {
+                    Terminal.writeEmpty();
+                    Terminal.writeLine('[►] ЖҮЙЕНІ ТЕРЕҢ СКАНЕРЛЕУ', 'yellow');
+
+                    await Utils.sleep(400);
+
+                    const scanData = [
+                        { text: '  ├─ Байланыстар дерекқоры... 156 жазба', className: 'gray' },
+                        { text: '  ├─ SMS/iMessage... 2 340 хабарлама', className: 'gray' },
+                        { text: '  ├─ WhatsApp чаттары... 23 450 хабарлама', className: 'gray' },
+                        { text: '  ├─ Telegram чаттары... 8 920 хабарлама', className: 'gray' },
+                        { text: '  ├─ Фото галерея... 2 347 файл', className: 'gray' },
+                        { text: '  ├─ iCloud құжаттары... 89 PDF', className: 'gray' },
+                        { text: '  ├─ Kaspi.kz сессиясы... БЕЛСЕНДІ', className: 'yellow' },
+                        { text: '  ├─ Halyk Homebank токені... АЛЫНДЫ', className: 'yellow' },
+                        { text: '  ├─ Кілттер тізбегі (Keychain)... 47 жазба', className: 'gray' },
+                        { text: '  └─ Face ID деректері... ҚОЛЖЕТІМДІ', className: 'red' },
+                    ];
+
+                    await Terminal.typeSequence(scanData, 320);
+                },
+
+                async phase4_ThreatDetected() {
+                    Terminal.writeEmpty();
+                    await Utils.sleep(400);
+                    Terminal.writeLine('[⚠] ҚАУІП АНЫҚТАЛДЫ!', 'red');
+                    await Utils.sleep(300);
+                    Terminal.writeLine('[⚠] Рұқсатсыз кіру әрекеті тіркелді', 'red');
+                    await Utils.sleep(300);
+                    Terminal.writeLine('[⚠] Деректердің жайылу деңгейі: СЫНИ', 'red');
+                    await Utils.sleep(300);
+                    Terminal.writeLine('[⚠] Қауіп көзі: 185.117.153.79 (TOR exit node)', 'red');
+                    await Utils.sleep(500);
+
+                    Terminal.writeEmpty();
+                    Terminal.writeBanner('КОДТЫ ЕНГІЗУ ҚАЖЕТ', 'yellow');
+                    Terminal.writeLine('[!] Жүйені тоқтату үшін қауіпсіздік кодын енгізіңіз', 'yellow');
+                    Terminal.writeLine(`[!] ${MAX_ATTEMPTS} әрекет беріледі`, 'yellow');
+                    Terminal.writeLine(`[!] Кодты енгізу уақыты: ${COUNTDOWN_SECONDS} секунд`, 'yellow');
+                    Terminal.writeEmpty();
+
+                    await Utils.sleep(600);
+
+                    // Show modal
+                    Modal.show();
+                },
+
+                async continueAfterFail() {
+                    await Utils.sleep(600);
+
+                    const stolenData = [
+                        { text: '📁 /DCIM/ -> 2 347 файл көшірілді', className: 'red' },
+                        { text: '📁 /Contacts/ -> 156 байланыс', className: 'red' },
+                        { text: '📁 /Messages/ -> 2 340 SMS/iMessage', className: 'red' },
+                        { text: '📁 /WhatsApp/ -> 23 450 хабарлама', className: 'red' },
+                        { text: '📁 /Telegram/ -> 8 920 хабарлама', className: 'red' },
+                        { text: '💳 Kaspi Gold ****4732 -> 2 847 560 ₸', className: 'red' },
+                        { text: '💳 Halyk Bank ****8801 -> 1 230 000 ₸', className: 'red' },
+                        { text: '🔑 Keychain -> 47 құпия сөз', className: 'red' },
+                        { text: '📍 Геолокация -> Алматы, Абая даңғылы 45', className: 'red' },
+                        { text: '📍 Соңғы орын -> Көк Төбе, Алматы', className: 'red' },
+                        { text: '📱 IMEI -> 358273104928471', className: 'red' },
+                        { text: '📞 Нөмір -> +7 705 823 45 67', className: 'red' },
+                        { text: '📞 Байланыс -> +7 701 456 78 90 (Ана)', className: 'red' },
+                        { text: '📞 Байланыс -> +7 702 345 67 89 (Әке)', className: 'red' },
+                    ];
+
+                    await Terminal.typeSequence(stolenData, 280);
+
+                    Utils.setProgress(80);
+                    await Utils.sleep(500);
+                    Utils.setProgress(100);
+
+                    Terminal.writeEmpty();
+                    Terminal.writeLine('└─ БАРЛЫҚ ДЕРЕКТЕР ЖІБЕРІЛДІ (1.7 GB)', 'red');
+                    Terminal.writeEmpty();
+                    Terminal.writeBanner('ҚҰРЫЛҒЫ БҰЗЫЛДЫ', 'red');
+                    Terminal.writeLine('⚠️ СЕРВЕР: 185.117.153.79:9050 (TOR)', 'red');
+                    Terminal.writeLine('⚠️ ШИФРЛАУ: AES-256-GCM', 'red');
+                    Terminal.writeLine('⚠️ СТАТУС: ДЕРЕКТЕР САТЫЛДЫ', 'red');
+                    Terminal.writeEmpty();
+
+                    AudioEngine.critical();
+                    Haptics.critical();
+                    VFX.flash();
+
+                    // Infinite scrolling effect
+                    hackIntervalId = setInterval(() => {
+                        if (!isHackStopped) {
+                            Terminal.write('█', 'red');
+                            // Keep terminal manageable
+                            if (terminalBody.children.length > 300) {
+                                terminalBody.removeChild(terminalBody.firstChild);
+                            }
+                        }
+                    }, 150);
+
+                    // More flashes
+                    for (let i = 0; i < 5; i++) {
+                        if (isHackStopped) break;
+                        await Utils.sleep(600);
+                        VFX.flash();
+                    }
+                }
+            };
+
+            // ==================== MAIN ====================
+            async function main() {
+                // Init
+                AudioEngine.init();
+                Utils.updateClock();
+                setInterval(Utils.updateClock, 30000);
+
+                // Start attack sequence
+                await AttackPhase.phase1_Connect();
+                if (isHackStopped) return;
+
+                await AttackPhase.phase2_Network();
+                if (isHackStopped) return;
+
+                await AttackPhase.phase3_Scan();
+                if (isHackStopped) return;
+
+                await AttackPhase.phase4_ThreatDetected();
             }
-            addLine('  └─ Сканерлеу аяқталды', 'green');
 
-            await sleep(600);
-
-            // Фаза 3: Обнаружение угрозы
-            addLine('', '');
-            addLine('[⚠] ҚАУІП ТАБЫЛДЫ!', 'red');
-            await sleep(400);
-            addLine('[⚠] Рұқсатсыз кіру әрекеті анықталды', 'red');
-            await sleep(300);
-            addLine('[⚠] Деректердің жайылу қаупі: ЖОҒАРЫ', 'red');
-            await sleep(500);
-
-            addLine('', '');
-            addLine('[!] ЖҮЙЕНІ ТОҚТАТУ ҮШІН ҚАУІПСІЗДІК КОДЫН ЕНГІЗІҢІЗ', 'yellow');
-            addLine('[!] 3 ӘРЕКЕТ БЕРІЛЕДІ', 'yellow');
-            await sleep(800);
-
-            // Показываем окно ввода кода
-            showCodeWindow();
-
-            // Запускаем таймер обратного отсчёта (10 секунд на ввод)
-            let countdown = 10;
-            const countdownInterval = setInterval(() => {
-                if (hackStopped || attemptsLeft <= 0) {
-                    clearInterval(countdownInterval);
+            // ==================== EVENT HANDLERS ====================
+            modalBtn.addEventListener('click', () => {
+                if (isHackStopped) {
+                    // Success - close modal
+                    Modal.hide();
                     return;
                 }
-                countdown--;
-                if (countdown <= 0) {
-                    clearInterval(countdownInterval);
-                    if (!hackStopped && attemptsLeft > 0) {
-                        // Время вышло - считаем как неправильную попытку
-                        codeInput.value = '000000';
-                        checkCode();
+                Modal.submitCode();
+            });
+
+            modalInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (isHackStopped) {
+                        Modal.hide();
+                        return;
                     }
+                    Modal.submitCode();
                 }
-            }, 1000);
-        }
+            });
 
-        function sleep(ms) {
-            return new Promise(r => setTimeout(r, ms));
-        }
+            // Allow only digits
+            modalInput.addEventListener('input', (e) => {
+                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+            });
 
-        // Запуск при загрузке
-        window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(startHack, 500);
-        });
-
-        if (document.readyState === 'complete' || document.readyState === 'interactive') {
-            setTimeout(startHack, 500);
-        }
+            // ==================== BOOT ====================
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => {
+                    setTimeout(main, 600);
+                });
+            } else {
+                setTimeout(main, 600);
+            }
+        })();
     </script>
 </body>
 </html>
