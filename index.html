@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Безопасность устройства</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+            overflow-y: auto;
+            height: 100vh;
+            width: 100vw;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Экран загрузки */
+        .boot-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .boot-logo {
+            width: 80px;
+            height: 80px;
+            border: 3px solid #0f0;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px #0f0; }
+            50% { box-shadow: 0 0 60px #0f0, 0 0 100px #0f0; }
+        }
+
+        .boot-text {
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            letter-spacing: 3px;
+        }
+
+        /* Основной контейнер */
+        .phone-frame {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            display: none;
+            flex-direction: column;
+        }
+
+        /* Статус-бар */
+        .status-bar {
+            background: #000;
+            color: #fff;
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .status-icons {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Терминал */
+        .terminal {
+            flex: 1;
+            background: #000;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #0f0;
+            overflow-y: auto;
+            line-height: 1.8;
+            height: calc(100vh - 40px);
+        }
+
+        .terminal .line {
+            opacity: 0;
+            animation: fadeIn 0.1s forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .terminal .red {
+            color: #ff3333;
+        }
+
+        .terminal .yellow {
+            color: #ffcc00;
+        }
+
+        .terminal .green {
+            color: #00ff41;
+        }
+
+        .terminal .gray {
+            color: #666;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 15px;
+            background: #0f0;
+            animation: blink 1s infinite;
+            vertical-align: middle;
+            margin-left: 2px;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* Уведомления */
+        .notification-center {
+            position: fixed;
+            top: 10px;
+            left: 5%;
+            right: 5%;
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .notification {
+            background: rgba(28, 28, 30, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 14px;
+            padding: 14px;
+            border: 0.5px solid #333;
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .telegram-icon { background: #0088cc; }
+        .sms-icon { background: #34c759; }
+        .bank-icon { background: #ff3b30; }
+        .system-icon { background: #ff9500; }
+
+        .notification-content {
+            flex: 1;
+            color: #fff;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 2px;
+        }
+
+        .notification-text {
+            font-size: 11px;
+            color: #999;
+        }
+
+        /* Кнопка запуска */
+        .start-attack {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #ff0000, #cc0000);
+            color: #fff;
+            border: none;
+            padding: 20px 50px;
+            font-size: 20px;
+            font-weight: 800;
+            border-radius: 50px;
+            letter-spacing: 2px;
+            z-index: 3000;
+            cursor: pointer;
+            box-shadow: 0 10px 40px rgba(255, 0, 0, 0.5);
+            animation: shake 3s infinite;
+            text-transform: uppercase;
+        }
+
+        @keyframes shake {
+            0%, 90%, 100% { transform: translateX(-50%) rotate(0deg); }
+            92% { transform: translateX(-50%) rotate(3deg); }
+            94% { transform: translateX(-50%) rotate(-3deg); }
+            96% { transform: translateX(-50%) rotate(2deg); }
+            98% { transform: translateX(-50%) rotate(-2deg); }
+        }
+
+        .start-attack:active {
+            transform: translateX(-50%) scale(0.95);
+            box-shadow: 0 5px 20px rgba(255, 0, 0, 0.8);
+        }
+
+        /* Оверлей блокировки */
+        .lock-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 400;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+
+        .lock-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .lock-text {
+            font-size: 18px;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+        }
+
+        .pin-dots {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .pin-dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            transition: all 0.3s;
+        }
+
+        .pin-dot.filled {
+            background: #0f0;
+            border-color: #0f0;
+            box-shadow: 0 0 15px #0f0;
+        }
+
+        .pin-dot.error {
+            background: #ff0000;
+            border-color: #ff0000;
+            box-shadow: 0 0 15px #ff0000;
+        }
+
+        .warning-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #ff0000;
+            color: #fff;
+            text-align: center;
+            padding: 15px;
+            font-weight: 800;
+            font-size: 14px;
+            letter-spacing: 1px;
+            z-index: 600;
+            display: none;
+            animation: slideDown 0.5s;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Экран загрузки -->
+    <div class="boot-screen" id="bootScreen">
+        <div class="boot-logo">🛡️</div>
+        <div class="boot-text">ИДЁТ ПРОВЕРКА БЕЗОПАСНОСТИ...</div>
+    </div>
+
+    <!-- Предупреждающий баннер -->
+    <div class="warning-banner" id="warningBanner">
+        ⚠️ ОБНАРУЖЕНА УГРОЗА БЕЗОПАСНОСТИ ⚠️
+    </div>
+
+    <!-- Фрейм телефона -->
+    <div class="phone-frame" id="phoneFrame">
+        <div class="status-bar">
+            <span id="timeDisplay">10:23</span>
+            <div class="status-icons">
+                <span>📶</span>
+                <span>📳</span>
+                <span>🔋 87%</span>
+            </div>
+        </div>
+
+        <!-- Центр уведомлений -->
+        <div class="notification-center" id="notificationCenter"></div>
+
+        <!-- Терминал -->
+        <div class="terminal" id="terminal"></div>
+
+        <!-- Оверлей блокировки -->
+        <div class="lock-overlay" id="lockOverlay">
+            <div class="lock-icon">🔒</div>
+            <div class="lock-text">ВЗЛОМ БЛОКИРОВКИ...</div>
+            <div class="pin-dots">
+                <div class="pin-dot" id="dot1"></div>
+                <div class="pin-dot" id="dot2"></div>
+                <div class="pin-dot" id="dot3"></div>
+                <div class="pin-dot" id="dot4"></div>
+                <div class="pin-dot" id="dot5"></div>
+                <div class="pin-dot" id="dot6"></div>
+            </div>
+            <div style="color:#666; font-size:12px;" id="pinStatus">Подбор PIN-кода...</div>
+        </div>
+    </div>
+
+    <!-- Кнопка запуска -->
+    <button class="start-attack" id="startBtn">▶︎ НАЧАТЬ АТАКУ</button>
+
+    <script>
+        // ============ ЗВУКИ ============
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new AudioContext();
+            }
+        }
+
+        function playBeep(freq, duration, type = 'square', vol = 0.08) {
+            if (!audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.value = freq;
+                gain.gain.value = vol;
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(audioCtx.currentTime);
+                osc.stop(audioCtx.currentTime + duration / 1000);
+            } catch(e) {}
+        }
+
+        function playTyping() {
+            playBeep(1000 + Math.random() * 200, 30, 'square', 0.03);
+        }
+
+        function playAlert() {
+            playBeep(800, 100, 'sawtooth', 0.1);
+            setTimeout(() => playBeep(1000, 150, 'sawtooth', 0.1), 100);
+        }
+
+        function playError() {
+            playBeep(200, 300, 'sawtooth', 0.15);
+        }
+
+        function playSuccess() {
+            playBeep(800, 80, 'sine', 0.08);
+            setTimeout(() => playBeep(1200, 100, 'sine', 0.08), 80);
+        }
+
+        // ============ ВИБРАЦИЯ ============
+        function vibrate(pattern) {
+            if (navigator.vibrate) {
+                navigator.vibrate(pattern);
+            }
+        }
+
+        // ============ DOM элементы ============
+        const bootScreen = document.getElementById('bootScreen');
+        const phoneFrame = document.getElementById('phoneFrame');
+        const terminal = document.getElementById('terminal');
+        const startBtn = document.getElementById('startBtn');
+        const notificationCenter = document.getElementById('notificationCenter');
+        const lockOverlay = document.getElementById('lockOverlay');
+        const warningBanner = document.getElementById('warningBanner');
+        const pinDots = document.querySelectorAll('.pin-dot');
+        const pinStatus = document.getElementById('pinStatus');
+        const timeDisplay = document.getElementById('timeDisplay');
+
+        let attackStarted = false;
+
+        // Обновляем время
+        function updateTime() {
+            const now = new Date();
+            timeDisplay.textContent = now.toLocaleTimeString('ru-RU', {hour: '2-digit', minute: '2-digit'});
+        }
+        updateTime();
+        setInterval(updateTime, 10000);
+
+        // ============ ТЕРМИНАЛ ============
+        function addTerminalLine(text, color = '') {
+            const div = document.createElement('div');
+            div.className = `line ${color}`;
+            div.innerHTML = text;
+            terminal.appendChild(div);
+            terminal.scrollTop = terminal.scrollHeight;
+            playTyping();
+        }
+
+        function addCommand(cmd) {
+            addTerminalLine(`<span style="color:#0f0;">root@kali:~#</span> <span style="color:#fff;">${cmd}</span>`);
+        }
+
+        function addOutput(text, color = 'gray') {
+            addTerminalLine(text, color);
+        }
+
+        function addSpacer() {
+            addTerminalLine('', '');
+        }
+
+        // ============ УВЕДОМЛЕНИЯ ============
+        function showNotification(iconClass, iconEmoji, title, text, duration = 3000) {
+            const notif = document.createElement('div');
+            notif.className = 'notification';
+            notif.innerHTML = `
+                <div class="notification-icon ${iconClass}">${iconEmoji}</div>
+                <div class="notification-content">
+                    <div class="notification-title">${title}</div>
+                    <div class="notification-text">${text}</div>
+                </div>
+            `;
+            notificationCenter.appendChild(notif);
+            
+            setTimeout(() => {
+                notif.classList.add('show');
+                vibrate([50, 50, 50]);
+                playAlert();
+            }, 100);
+
+            setTimeout(() => {
+                notif.classList.remove('show');
+                setTimeout(() => notif.remove(), 500);
+            }, duration);
+        }
+
+        // ============ ПОДБОР PIN ============
+        function animatePinBruteforce() {
+            return new Promise((resolve) => {
+                lockOverlay.style.display = 'flex';
+                let attempts = 0;
+                const maxAttempts = 15;
+                
+                function tryPin() {
+                    if (attempts >= maxAttempts) {
+                        // Успех
+                        pinDots.forEach(d => {
+                            d.className = 'pin-dot filled';
+                        });
+                        pinStatus.textContent = 'PIN ВЗЛОМАН: 483026';
+                        pinStatus.style.color = '#0f0';
+                        playSuccess();
+                        vibrate([100]);
+                        setTimeout(() => {
+                            lockOverlay.style.display = 'none';
+                            resolve();
+                        }, 800);
+                        return;
+                    }
+
+                    // Заполняем точки
+                    const filledCount = Math.min(attempts + 1, 6);
+                    pinDots.forEach((d, i) => {
+                        d.className = i < filledCount ? 'pin-dot filled' : 'pin-dot';
+                    });
+                    
+                    if (attempts > 0 && attempts % 3 === 0) {
+                        // Ошибка
+                        pinDots.forEach(d => d.className = 'pin-dot error');
+                        pinStatus.textContent = `Неверный PIN (попытка ${attempts})`;
+                        pinStatus.style.color = '#ff0000';
+                        playError();
+                        vibrate([100, 50, 100]);
+                        
+                        setTimeout(() => {
+                            pinDots.forEach(d => d.className = 'pin-dot');
+                            attempts++;
+                            setTimeout(tryPin, 200 + Math.random() * 300);
+                        }, 500);
+                    } else {
+                        attempts++;
+                        setTimeout(tryPin, 150 + Math.random() * 200);
+                    }
+                }
+
+                setTimeout(tryPin, 500);
+            });
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // ============ ГЛАВНАЯ АТАКА ============
+        async function startAttack() {
+            if (attackStarted) return;
+            attackStarted = true;
+            
+            initAudio();
+            
+            // Скрываем кнопку и экран загрузки
+            startBtn.style.display = 'none';
+            bootScreen.style.display = 'none';
+            
+            // Показываем фрейм телефона
+            phoneFrame.style.display = 'flex';
+            
+            // Небольшая задержка для рендера
+            await sleep(300);
+            
+            // Начало
+            addSpacer();
+            addTerminalLine('╔══════════════════════════════════════╗', 'red');
+            addTerminalLine('║   🔴 СПЕЦОПЕРАЦИЯ "ТРОЯНСКИЙ КОНЬ"   ║', 'red');
+            addTerminalLine('╚══════════════════════════════════════╝', 'red');
+            addSpacer();
+            await sleep(500);
+
+            addCommand('ssh -t root@target-device');
+            await sleep(800);
+            addOutput('Connecting to 192.168.1.107:22...', 'gray');
+            await sleep(600);
+            addOutput('Connection established.', 'gray');
+            addOutput('Fingerprint: SHA256:7xKp2mN4...', 'gray');
+            await sleep(400);
+            addOutput('root@192.168.1.107 password: ********', 'gray');
+            await sleep(500);
+            addOutput('Access granted.', 'green');
+            addSpacer();
+            await sleep(300);
+
+            // Сбор информации
+            addCommand('uname -a && getprop ro.build.version.release');
+            await sleep(400);
+            addOutput('Linux localhost 4.14.336 Android 14', 'gray');
+            addSpacer();
+            await sleep(300);
+
+            addCommand('cat /proc/cpuinfo | grep -E "model|cores"');
+            await sleep(300);
+            addOutput('model name : ARM Cortex-X3', 'gray');
+            addOutput('cpu cores : 8', 'gray');
+            addSpacer();
+            await sleep(300);
+
+            addCommand('dumpsys package com.android.providers.telephony');
+            await sleep(400);
+            addOutput('Extracting IMEI...', 'yellow');
+            await sleep(500);
+            addOutput('IMEI 1: 358273104928471', 'red');
+            addOutput('IMEI 2: 358273104928489', 'red');
+            vibrate([30, 30, 30]);
+            addSpacer();
+            await sleep(400);
+
+            // Контакты
+            addCommand('content query --uri content://contacts/phones');
+            await sleep(500);
+            addOutput('Extracting contacts database...', 'yellow');
+            await sleep(600);
+            const contacts = [
+                'Мама 📱 +7(916)123-45-67',
+                'Папа 📱 +7(916)234-56-78',
+                'Любимая ❤️ +7(999)888-77-66',
+                'Босс 👔 +7(495)111-22-33',
+                'Коллега Саша +7(926)555-44-33',
+                'Банк ВТБ 🏦 8-800-100-24-24'
+            ];
+            contacts.forEach(c => addOutput(`  ${c}`, 'gray'));
+            addOutput(`Total: ${contacts.length} contacts extracted.`, 'yellow');
+            addSpacer();
+            await sleep(400);
+
+            // Уведомления
+            showNotification('telegram-icon', '✈️', 'Telegram', 'Код подтверждения: 48302');
+            await sleep(500);
+            showNotification('sms-icon', '💬', 'СМС', 'Ваш пароль: не делитесь им ни с кем');
+            await sleep(400);
+
+            // Галерея
+            addCommand('find /sdcard/DCIM -name "*.jpg" -o -name "*.mp4"');
+            await sleep(500);
+            addOutput('Scanning media files...', 'yellow');
+            await sleep(800);
+            const media = [
+                'IMG_20231015_142302.jpg (2.4 MB)',
+                'IMG_20231120_091847.jpg (3.1 MB)',
+                'VID_20231201_220145.mp4 (145 MB)',
+                'document_scan_001.pdf (0.8 MB)',
+                'passport_photo.png (1.2 MB) 🔴'
+            ];
+            media.forEach(m => addOutput(`  ${m}`, 'gray'));
+            addOutput('47 media files found.', 'yellow');
+            addSpacer();
+            await sleep(500);
+
+            // Банковские уведомления
+            showNotification('bank-icon', '🏦', 'СберБанк Онлайн', 'Вход в приложение с нового устройства', 4000);
+            await sleep(600);
+            showNotification('system-icon', '⚠️', 'Безопасность', 'Обнаружена подозрительная активность', 4000);
+
+            // Соцсети
+            addCommand('dumpsys package com.whatsapp | grep databases');
+            await sleep(400);
+            addOutput('WhatsApp databases found:', 'yellow');
+            addOutput('  msgstore.db (2.3 GB)', 'gray');
+            addOutput('  wa.db (156 MB)', 'gray');
+            await sleep(300);
+            addOutput('Extracting chat history...', 'yellow');
+            await sleep(800);
+            addOutput('  Чаты: 23 диалога', 'gray');
+            addOutput('  Сообщения: 14,582', 'gray');
+            addOutput('  Медиа: 3,201 файл', 'gray');
+            vibrate([50, 30, 50, 30, 50]);
+            addSpacer();
+            await sleep(400);
+
+            // Банковские данные
+            addCommand('dumpsys package com.sberbankmobile | grep -A 5 tokens');
+            await sleep(500);
+            addOutput('⚠️ INTERCEPTING BANKING DATA ⚠️', 'red');
+            await sleep(600);
+            addOutput('  Session token: eyJhbGciOiJSUzI1NiIs...', 'red');
+            addOutput('  Card: **** **** **** 4732', 'red');
+            addOutput('  Balance: 156,430.00 ₽', 'red');
+            addOutput('  Credit limit: 500,000.00 ₽', 'red');
+            vibrate([100, 50, 100, 50, 200]);
+            addSpacer();
+            await sleep(400);
+
+            // Геолокация
+            addCommand('dumpsys location | grep -A 3 "Last Known Locations"');
+            await sleep(500);
+            addOutput('GPS Tracking active...', 'yellow');
+            await sleep(600);
+            const coords = [
+                '55.751244, 37.618423 (Кремль, Москва)',
+                '55.752023, 37.617499 (Красная площадь)',
+            ];
+            coords.forEach(c => addOutput(`  📍 ${c}`, 'red'));
+            showNotification('system-icon', '📍', 'Геолокация', 'Ваше местоположение отслеживается', 5000);
+            addSpacer();
+            await sleep(500);
+
+            // Брутфорс PIN
+            addCommand('locksettings verify --old 000000');
+            await sleep(300);
+            addOutput('Initiating lockscreen bypass...', 'yellow');
+            await sleep(500);
+            
+            await animatePinBruteforce();
+            addSpacer();
+            await sleep(300);
+            
+            addCommand('locksettings clear --confirm');
+            await sleep(400);
+            addOutput('Lockscreen DISABLED.', 'red');
+            vibrate([200]);
+            addSpacer();
+            await sleep(300);
+
+            // Финал
+            warningBanner.style.display = 'block';
+            vibrate([100, 50, 100, 50, 100, 50, 500]);
+
+            addTerminalLine('╔══════════════════════════════════════╗', 'red');
+            addTerminalLine('║   🔴 КРИТИЧЕСКОЕ ПРЕДУПРЕЖДЕНИЕ     ║', 'red');
+            addTerminalLine('╚══════════════════════════════════════╝', 'red');
+            addSpacer();
+            addOutput('ВСЕ ДАННЫЕ СКОПИРОВАНЫ НА УДАЛЁННЫЙ СЕРВЕР', 'red');
+            addOutput('СЕРВЕР: 45.153.241.87:9050', 'red');
+            addOutput('ПРОТОКОЛ: TOR ENCRYPTED', 'red');
+            addOutput('СТАТУС: ПЕРЕДАЧА ЗАВЕРШЕНА', 'red');
+            addSpacer();
+            addOutput('Устройство полностью скомпрометировано.', 'red');
+            addOutput('Рекомендуется: НЕМЕДЛЕННО ОТКЛЮЧИТЬ УСТРОЙСТВО', 'red');
+            addSpacer();
+            
+            for (let i = 0; i < 5; i++) {
+                addTerminalLine('⚠️ СИСТЕМА ВЗЛОМАНА ⚠️', 'red');
+                playAlert();
+                await sleep(500);
+            }
+
+            // Финальные уведомления
+            showNotification('bank-icon', '💀', 'БАНК', 'СПИСАНИЕ СРЕДСТВ...', 10000);
+            setTimeout(() => {
+                showNotification('system-icon', '🚨', 'СИСТЕМА', 'ВСЕ ПАРОЛИ СКОМПРОМЕТИРОВАНЫ', 10000);
+            }, 1000);
+
+            // Эффект продолжающегося взлома
+            setInterval(() => {
+                addTerminalLine('█', 'red');
+                if (terminal.children.length > 200) {
+                    terminal.removeChild(terminal.firstChild);
+                }
+            }, 200);
+        }
+
+        // ============ ЗАПУСК ============
+        startBtn.addEventListener('click', () => {
+            startBtn.textContent = '▶︎ ЗАПУСК...';
+            startBtn.style.pointerEvents = 'none';
+            setTimeout(() => startAttack(), 300);
+        });
+
+        console.log('Страница загружена. Кнопка видна. Жми!');
+    </script>
+</body>
+</html>
