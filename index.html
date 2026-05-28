@@ -2,1035 +2,904 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Система безопасности</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ SYSTEM OVERRIDE DETECTED ⚡</title>
+    <!-- Tailwind CSS for high-fidelity styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for retro matrix and tech look -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&family=Inter:wght@400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <!-- FontAwesome for scary security icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        :root {
-            --bg: #000000;
-            --surface: #0a0a0a;
-            --card: #111111;
-            --border: #1a1a1a;
-            --text: #ffffff;
-            --secondary: #98989d;
-            --red: #ff3b30;
-            --green: #30d158;
-            --amber: #ff9f0a;
-            --blue: #0a84ff;
-            --font-mono: 'SF Mono', 'Menlo', 'Courier New', monospace;
-            --font-system: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
         body {
-            background: var(--bg);
-            font-family: var(--font-system);
-            height: 100vh;
-            height: 100dvh;
-            width: 100vw;
-            overflow: hidden;
-            color: var(--text);
-            -webkit-font-smoothing: antialiased;
-            position: relative;
+            font-family: 'Inter', sans-serif;
+            background-color: #030303;
+            overflow-x: hidden;
         }
-
-        /* ==================== ФОН ==================== */
-        .bg-grid {
+        .font-mono-hacker {
+            font-family: 'Share Tech Mono', 'Fira Code', monospace;
+        }
+        /* Scanline CRT simulation effect */
+        .scanlines {
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.03;
-            background-image: 
-                linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-
-        .bg-scan {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(255,59,48,0.4), transparent);
-            pointer-events: none;
-            z-index: 0;
-            animation: scanDown 3s linear infinite;
-        }
-
-        @keyframes scanDown {
-            0% { top: 0; }
-            100% { top: 100%; }
-        }
-
-        /* ==================== ОСНОВНОЙ КОНТЕЙНЕР ==================== */
-        .main-container {
-            position: relative;
-            z-index: 1;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            display: flex;
-            flex-direction: column;
-            padding: 10px;
-            gap: 8px;
-        }
-
-        /* ==================== ЗАГОЛОВОК ==================== */
-        .header {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-shrink: 0;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .header-icon {
-            width: 36px; height: 36px;
-            border-radius: 8px;
-            background: #1a0000;
-            border: 1px solid #3d0000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            animation: iconPulse 2s ease-in-out infinite;
-        }
-
-        @keyframes iconPulse {
-            0%, 100% { box-shadow: 0 0 0 rgba(255,59,48,0); }
-            50% { box-shadow: 0 0 12px rgba(255,59,48,0.3); }
-        }
-
-        .header-title {
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        .header-subtitle {
-            font-size: 10px;
-            color: var(--secondary);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .header-status {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 11px;
-            color: var(--red);
-            font-weight: 600;
-        }
-
-        .status-dot {
-            width: 6px; height: 6px;
-            border-radius: 50%;
-            background: var(--red);
-            animation: dotBlink 1s step-end infinite;
-        }
-
-        @keyframes dotBlink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
-
-        /* ==================== ИНФО-ПАНЕЛЬ ==================== */
-        .info-panel {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 14px 16px;
-            flex-shrink: 0;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 0;
-            font-size: 13px;
-        }
-
-        .info-label {
-            color: var(--secondary);
-            font-size: 12px;
-        }
-
-        .info-value {
-            font-family: var(--font-mono);
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .info-value.red { color: var(--red); }
-        .info-value.green { color: var(--green); }
-        .info-value.amber { color: var(--amber); }
-
-        .info-divider {
-            height: 1px;
-            background: var(--border);
-            margin: 4px 0;
-        }
-
-        /* ==================== ОКНО ТЕРМИНАЛА ==================== */
-        .terminal-window {
-            flex: 1;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            min-height: 0;
-        }
-
-        .terminal-header {
-            background: #161616;
-            padding: 10px 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border-bottom: 1px solid var(--border);
-            flex-shrink: 0;
-        }
-
-        .terminal-dot {
-            width: 10px; height: 10px;
-            border-radius: 50%;
-        }
-        .terminal-dot.red { background: #ff5f57; }
-        .terminal-dot.yellow { background: #ffbd2e; }
-        .terminal-dot.green { background: #28c840; }
-
-        .terminal-title-text {
-            flex: 1;
-            text-align: center;
-            font-size: 11px;
-            color: var(--secondary);
-            font-family: var(--font-mono);
-            letter-spacing: 0.5px;
-        }
-
-        .terminal-body {
-            flex: 1;
-            padding: 12px 14px;
-            overflow-y: auto;
-            font-family: var(--font-mono);
-            font-size: 12px;
-            line-height: 1.8;
-            color: var(--text);
-            -webkit-overflow-scrolling: touch;
-            word-break: break-all;
-        }
-
-        .terminal-body::-webkit-scrollbar { width: 2px; }
-        .terminal-body::-webkit-scrollbar-track { background: transparent; }
-        .terminal-body::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
-
-        .log-line {
-            opacity: 0;
-            animation: logFadeIn 0.1s ease forwards;
-        }
-
-        @keyframes logFadeIn {
-            to { opacity: 1; }
-        }
-
-        .log-line .red { color: var(--red); }
-        .log-line .green { color: var(--green); }
-        .log-line .amber { color: var(--amber); }
-        .log-line .blue { color: var(--blue); }
-        .log-line .gray { color: var(--secondary); }
-        .log-line .dim { opacity: 0.5; }
-
-        .cursor-blink {
-            display: inline-block;
-            width: 6px; height: 13px;
-            background: var(--green);
-            animation: cursorAnim 1s step-end infinite;
-            vertical-align: middle;
-            margin-left: 3px;
-        }
-
-        @keyframes cursorAnim {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
-
-        /* ==================== ПРОГРЕСС ==================== */
-        .progress-section {
-            flex-shrink: 0;
-            padding: 0 2px;
-            opacity: 0;
-            transition: opacity 0.3s;
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%, 
+                rgba(0, 0, 0, 0.25) 50%
+            ), linear-gradient(
+                90deg,
+                rgba(255, 0, 0, 0.06),
+                rgba(0, 255, 0, 0.02),
+                rgba(0, 0, 255, 0.06)
+            );
+            background-size: 100% 4px, 6px 100%;
+            z-index: 999;
             pointer-events: none;
-        }
-        .progress-section.visible { opacity: 1; }
-
-        .progress-info {
-            display: flex;
-            justify-content: space-between;
-            font-size: 10px;
-            color: var(--secondary);
-            margin-bottom: 4px;
-            font-family: var(--font-mono);
-        }
-
-        .progress-bar {
-            height: 2px;
-            background: #1a1a1a;
-            border-radius: 1px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--red);
-            width: 0%;
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            border-radius: 1px;
-        }
-
-        /* ==================== МОДАЛЬНОЕ ОКНО ==================== */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.88);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            z-index: 100;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            animation: overlayIn 0.3s ease;
-        }
-        .modal-overlay.active { display: flex; }
-
-        @keyframes overlayIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .modal-dialog {
-            background: #0d0d0d;
-            border: 1px solid #222;
-            border-radius: 16px;
-            width: 88%;
-            max-width: 360px;
-            padding: 28px 22px 22px;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.9);
-            animation: dialogIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes dialogIn {
-            from { transform: scale(0.9) translateY(20px); opacity: 0; }
-            to { transform: scale(1) translateY(0); opacity: 1; }
-        }
-
-        .modal-icon-wrap {
-            width: 64px; height: 64px;
-            border-radius: 50%;
-            background: #1a0000;
-            border: 2px solid #3d0000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            margin: 0 auto 16px;
-            animation: modalIconPulse 2s ease-in-out infinite;
-        }
-
-        @keyframes modalIconPulse {
-            0%, 100% { box-shadow: 0 0 0 rgba(255,59,48,0); }
-            50% { box-shadow: 0 0 25px rgba(255,59,48,0.4); }
-        }
-
-        .modal-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text);
-            margin-bottom: 6px;
-            letter-spacing: -0.3px;
-        }
-
-        .modal-subtitle {
-            font-size: 13px;
-            color: var(--secondary);
-            margin-bottom: 20px;
-            line-height: 1.4;
-        }
-
-        .modal-attempts {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            margin-bottom: 18px;
-            font-size: 13px;
-            color: var(--amber);
-            font-weight: 500;
-        }
-
-        .attempt-dot {
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            background: var(--amber);
-            transition: all 0.3s;
-        }
-        .attempt-dot.used {
-            background: #333;
-        }
-
-        .modal-input {
-            width: 100%;
-            background: #000;
-            border: 2px solid #333;
-            color: var(--text);
-            font-family: var(--font-mono);
-            font-size: 26px;
-            padding: 14px 10px;
-            text-align: center;
-            border-radius: 12px;
-            letter-spacing: 10px;
-            outline: none;
-            caret-color: var(--red);
-            transition: all 0.2s ease;
-            margin-bottom: 14px;
-        }
-
-        .modal-input:focus {
-            border-color: var(--red);
-            box-shadow: 0 0 20px rgba(255,59,48,0.25);
-        }
-
-        .modal-input.error {
-            border-color: var(--red);
-            animation: inputShake 0.4s ease;
-        }
-
-        .modal-input.success {
-            border-color: var(--green);
-            box-shadow: 0 0 20px rgba(48,209,88,0.25);
-        }
-
-        @keyframes inputShake {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-6px); }
-            40% { transform: translateX(6px); }
-            60% { transform: translateX(-4px); }
-            80% { transform: translateX(4px); }
-        }
-
-        .modal-input::placeholder {
-            color: #222;
-            letter-spacing: 2px;
-            font-size: 14px;
-        }
-
-        .modal-error-msg {
-            font-size: 12px;
-            color: var(--red);
-            min-height: 18px;
-            margin-bottom: 6px;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-        .modal-error-msg.visible { opacity: 1; }
-
-        .modal-timer {
-            font-size: 12px;
-            color: var(--secondary);
-            margin-bottom: 10px;
-        }
-        .modal-timer.urgent { color: var(--red); }
-
-        .modal-btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            background: var(--red);
-            color: #fff;
-            letter-spacing: 1px;
-        }
-
-        .modal-btn:active {
-            transform: scale(0.97);
             opacity: 0.85;
         }
-
-        .modal-btn.success-btn {
-            background: var(--green);
-            color: #000;
+        /* Matrix screen flicker */
+        @keyframes flicker {
+            0% { opacity: 0.98; }
+            50% { opacity: 1; }
+            100% { opacity: 0.99; }
         }
-
-        /* ==================== ВСПЫШКА ==================== */
-        .red-flash {
+        .flicker-active {
+            animation: flicker 0.15s infinite;
+        }
+        /* Custom scrollbar for hacking logs */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #22c55e;
+            border-radius: 3px;
+        }
+        /* Matrix digital glitch */
+        .glitch-text {
+            text-shadow: 0.05em 0 0 rgba(255, 0, 0, 0.75),
+                         -0.025em -0.05em 0 rgba(0, 255, 0, 0.75),
+                         0.025em 0.05em 0 rgba(0, 0, 255, 0.75);
+            animation: glitch 1s infinite;
+        }
+        @keyframes glitch {
+            0% { text-shadow: 1px 1px 0px rgba(255,0,0,0.5), -1px -1px 0px rgba(0,255,0,0.5); }
+            50% { text-shadow: -1px 2px 0px rgba(255,0,0,0.5), 2px -1px 0px rgba(0,0,255,0.5); }
+            100% { text-shadow: 2px -1px 0px rgba(0,255,0,0.5), -2px 1px 0px rgba(255,0,0,0.5); }
+        }
+        /* Radial vignette darkness */
+        .vignette {
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(255,0,0,0.2);
-            z-index: 200;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.95);
+            z-index: 998;
             pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.1s ease;
         }
-        .red-flash.active { opacity: 1; }
-
-        /* ==================== СТАТУС-БАР ==================== */
-        .top-bar {
-            background: #000;
-            padding: 8px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 12px;
-            font-weight: 500;
-            flex-shrink: 0;
-            border-bottom: 1px solid #111;
+        /* Spinner wheel animation */
+        @keyframes spin-wheel {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(3600deg); }
         }
-        .top-bar-right {
-            display: flex;
-            gap: 6px;
-            align-items: center;
+        .spinning {
+            animation: spin-wheel 4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
         }
     </style>
 </head>
-<body>
+<body class="text-white relative select-none">
 
-    <!-- ФОН -->
-    <div class="bg-grid"></div>
-    <div class="bg-scan"></div>
-
-    <!-- КРАСНАЯ ВСПЫШКА -->
-    <div class="red-flash" id="redFlash"></div>
-
-    <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
-    <div class="top-bar">
-        <span id="timeDisplay">9:41</span>
-        <span class="top-bar-right">
-            <span>5G</span>
-            <span>Beeline KZ</span>
-            <span>▮▮▮▮</span>
-            <span>🔋</span>
-        </span>
+    <!-- Ambient Visual Filters (Only active during Prank) -->
+    <div id="visual-effects" class="hidden">
+        <div class="scanlines"></div>
+        <div class="vignette"></div>
     </div>
 
-    <!-- ОСНОВНОЙ КОНТЕЙНЕР -->
-    <div class="main-container" id="mainContainer">
-
-        <!-- ЗАГОЛОВОК -->
-        <div class="header">
-            <div class="header-left">
-                <div class="header-icon">🛡️</div>
+    <!-- This is the Creator Admin Panel to generate personalized links -->
+    <div id="setup-panel" class="min-h-screen bg-neutral-950 flex flex-col items-center justify-center p-4">
+        <div class="max-w-xl w-full bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-40 h-40 bg-green-500/10 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-emerald-600/10 rounded-full blur-3xl"></div>
+            
+            <div class="flex items-center gap-3 mb-6">
+                <div class="p-3 bg-green-500/10 text-green-400 rounded-xl">
+                    <i class="fa-solid fa-mask-face text-2xl"></i>
+                </div>
                 <div>
-                    <div class="header-title">Центр Кибербезопасности</div>
-                    <div class="header-subtitle">Республика Казахстан</div>
+                    <h1 class="text-2xl font-bold tracking-tight">Панель Розыгрыша ⚡</h1>
+                    <p class="text-xs text-neutral-400">Создай полностью реалистичный симулятор взлома для друга</p>
                 </div>
             </div>
-            <div class="header-status">
-                <span class="status-dot"></span>
-                ТРЕВОГА
+
+            <!-- Form parameters -->
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-neutral-300 mb-1">Имя друга (жертвы) для реализма</label>
+                    <input type="text" id="victim-name" placeholder="например, Димон" 
+                           class="w-full bg-neutral-950 border border-neutral-800 rounded-lg py-2.5 px-4 text-white focus:outline-none focus:border-green-500 transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-neutral-300 mb-1">Разоблачающее сообщение в самом конце</label>
+                    <textarea id="custom-message" rows="3" placeholder="Ха-ха! Тебя взломал Саня! Попался на классический байт! Твои данные в безопасности, расслабься 😂" 
+                              class="w-full bg-neutral-950 border border-neutral-800 rounded-lg py-2.5 px-4 text-white focus:outline-none focus:border-green-500 transition-colors"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-neutral-300 mb-2">Выберите стартовую «Приманку»</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <label class="relative flex flex-col p-4 bg-neutral-950 border border-neutral-800 rounded-xl cursor-pointer hover:border-neutral-700 transition-all select-none">
+                            <input type="radio" name="decoy" value="gift" checked class="absolute top-4 right-4 text-green-500 accent-green-500">
+                            <span class="font-bold text-sm text-yellow-500 mb-1"><i class="fa-solid fa-gift mr-1.5"></i>Розыгрыш Призов</span>
+                            <span class="text-xs text-neutral-400">Сайт предлагает прокрутить колесо фортуны (выиграй iPhone 17). Идеальный байт!</span>
+                        </label>
+                        <label class="relative flex flex-col p-4 bg-neutral-950 border border-neutral-800 rounded-xl cursor-pointer hover:border-neutral-700 transition-all select-none">
+                            <input type="radio" name="decoy" value="direct" class="absolute top-4 right-4 text-green-500 accent-green-500">
+                            <span class="font-bold text-sm text-red-500 mb-1"><i class="fa-solid fa-skull mr-1.5"></i>Мгновенный сбой</span>
+                            <span class="text-xs text-neutral-400">Режим без предыстории. Хакерский терминал запускается сразу при первом же клике на страницу.</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Sound notice -->
+                <div class="p-3 bg-neutral-950/50 border border-neutral-800/80 rounded-lg text-xs text-neutral-400 flex items-start gap-2.5">
+                    <i class="fa-solid fa-circle-info text-blue-400 mt-0.5"></i>
+                    <span>В пранк встроен реалистичный синтезатор звуков (системные ошибки, сирена, хакерский набор). Звук активируется в момент начала «взлома».</span>
+                </div>
+
+                <!-- Generated Output -->
+                <div id="link-output-area" class="hidden space-y-2 pt-2">
+                    <label class="block text-sm font-medium text-green-400">Твоя персональная ссылка для отправки жертве:</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="generated-link" readonly 
+                               class="w-full bg-neutral-950 border border-neutral-800 rounded-lg py-2 px-3 text-xs text-neutral-300 outline-none select-all font-mono">
+                        <button onclick="copyPrankLink()" class="bg-green-600 hover:bg-green-500 text-white font-medium text-xs px-4 rounded-lg transition-colors flex items-center gap-1.5 shrink-0">
+                            <i class="fa-regular fa-copy"></i> Копировать
+                        </button>
+                    </div>
+                    <p id="copy-toast" class="text-xs text-center text-green-500 font-semibold transition-opacity opacity-0">Ссылка успешно скопирована!</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                    <button onclick="generateLink()" class="w-full bg-green-600 hover:bg-green-500 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-lg shadow-green-900/10 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-link"></i> 1. Создать ссылку
+                    </button>
+                    <button onclick="testPrankDirectly()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play animate-pulse"></i> 2. Проверить в этом окне
+                    </button>
+                </div>
+            </div>
+            
+            <div class="mt-6 pt-6 border-t border-neutral-800 text-center text-xs text-neutral-500 flex justify-between items-center">
+                <span>Пранк симулятор 2026</span>
+                <span class="flex items-center gap-1"><i class="fa-solid fa-shield-halved text-green-500"></i> Абсолютно безопасно</span>
             </div>
         </div>
-
-        <!-- ИНФО-ПАНЕЛЬ -->
-        <div class="info-panel" id="infoPanel">
-            <div class="info-row">
-                <span class="info-label">Устройство</span>
-                <span class="info-value" id="infoDevice">—</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Номер</span>
-                <span class="info-value" id="infoPhone">—</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">IMEI</span>
-                <span class="info-value" id="infoIMEI">—</span>
-            </div>
-            <div class="info-divider"></div>
-            <div class="info-row">
-                <span class="info-label">Статус</span>
-                <span class="info-value amber" id="infoStatus">Сканирование...</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Угроза</span>
-                <span class="info-value red" id="infoThreat">—</span>
-            </div>
-        </div>
-
-        <!-- ТЕРМИНАЛ -->
-        <div class="terminal-window">
-            <div class="terminal-header">
-                <span class="terminal-dot red"></span>
-                <span class="terminal-dot yellow"></span>
-                <span class="terminal-dot green"></span>
-                <span class="terminal-title-text">terminal — root@kz-security — 80×24</span>
-            </div>
-            <div class="terminal-body" id="terminalBody"></div>
-        </div>
-
-        <!-- ПРОГРЕСС -->
-        <div class="progress-section" id="progressSection">
-            <div class="progress-info">
-                <span>ПЕРЕДАЧА ДАННЫХ</span>
-                <span id="progressText">0%</span>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
-        </div>
-
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО -->
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal-dialog" id="modalDialog">
-            <div class="modal-icon-wrap" id="modalIconWrap">🔐</div>
-            <div class="modal-title" id="modalTitle">ВВЕДИТЕ КОД</div>
-            <div class="modal-subtitle" id="modalSubtitle">
-                Для остановки системы введите<br>код безопасности
+    <!-- This screen tricks the victim into clicking something to authorize sound and trigger full screen -->
+    <div id="decoy-gift" class="hidden min-h-screen bg-gradient-to-br from-indigo-950 via-slate-900 to-purple-950 flex flex-col items-center justify-center p-4">
+        <div class="max-w-md w-full text-center bg-white/10 backdrop-blur-md rounded-3xl p-6 border border-white/20 shadow-2xl relative overflow-hidden">
+            <div class="absolute -top-12 -left-12 w-32 h-32 bg-pink-500/20 rounded-full blur-2xl"></div>
+            <div class="absolute -bottom-12 -right-12 w-32 h-32 bg-cyan-500/20 rounded-full blur-2xl"></div>
+
+            <div class="text-5xl mb-4 animate-bounce">🎁</div>
+            <h1 class="text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-pink-400 to-cyan-300 tracking-tight">
+                ПОЗДРАВЛЯЕМ!
+            </h1>
+            <p class="text-sm text-neutral-200 mt-2 font-medium">
+                Вы попали в список финалистов розыгрыша флагманских призов 2026 года!
+            </p>
+
+            <!-- Spinner Container -->
+            <div class="my-8 relative flex items-center justify-center">
+                <!-- Arrow Pointer -->
+                <div class="absolute top-0 z-10 text-yellow-400 text-3xl transform -translate-y-4">
+                    <i class="fa-solid fa-caret-down drop-shadow-lg"></i>
+                </div>
+                <!-- Wheel canvas-like SVG -->
+                <div id="spinner-wheel" class="w-64 h-64 rounded-full border-8 border-yellow-400 shadow-2xl relative overflow-hidden flex items-center justify-center bg-zinc-900 transition-transform duration-1000">
+                    <svg viewBox="0 0 100 100" class="w-full h-full transform -rotate-45">
+                        <circle cx="50" cy="50" r="50" fill="#18181b"/>
+                        <!-- Slice 1 -->
+                        <path d="M50,50 L50,0 A50,50 0 0,1 100,50 Z" fill="#e11d48"/>
+                        <!-- Slice 2 -->
+                        <path d="M50,50 L100,50 A50,50 0 0,1 50,100 Z" fill="#0284c7"/>
+                        <!-- Slice 3 -->
+                        <path d="M50,50 L50,100 A50,50 0 0,1 0,50 Z" fill="#16a34a"/>
+                        <!-- Slice 4 -->
+                        <path d="M50,50 L0,50 A50,50 0 0,1 50,0 Z" fill="#ca8a04"/>
+                    </svg>
+                    <!-- Inner Label Mockups on wheel -->
+                    <span class="absolute text-xs font-extrabold tracking-wider text-white rotate-45 transform translate-y-[-70px]">IPHONE 17</span>
+                    <span class="absolute text-xs font-extrabold tracking-wider text-white rotate-135 transform translate-x-[70px]">PS5 SLIM</span>
+                    <span class="absolute text-xs font-extrabold tracking-wider text-white -rotate-135 transform translate-y-[70px]">100,000₽</span>
+                    <span class="absolute text-xs font-extrabold tracking-wider text-white -rotate-45 transform translate-x-[-70px]">MACBOOK</span>
+                    <!-- Center Core Pin -->
+                    <div class="absolute w-12 h-12 bg-yellow-400 rounded-full border-4 border-zinc-950 flex items-center justify-center shadow-md">
+                        <div class="w-3 h-3 bg-zinc-950 rounded-full animate-ping"></div>
+                    </div>
+                </div>
             </div>
-            <div class="modal-attempts" id="modalAttempts">
-                <span>Попытки:</span>
-                <span class="attempt-dot" id="att1"></span>
-                <span class="attempt-dot" id="att2"></span>
-                <span class="attempt-dot" id="att3"></span>
+
+            <!-- Interaction Button -->
+            <button id="spin-button" onclick="triggerSpinner()" class="w-full bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-zinc-950 font-black text-lg py-4 px-6 rounded-2xl shadow-xl shadow-amber-950/40 hover:scale-[1.02] active:scale-[0.98] transition-all">
+                ИСПЫТАТЬ УДАЧУ <i class="fa-solid fa-clover ml-1.5 animate-spin"></i>
+            </button>
+
+            <!-- Fake trust info -->
+            <p class="text-[10px] text-neutral-400 mt-4 tracking-wide uppercase">
+                * Участие абсолютно бесплатно. Спонсировано ассоциацией ритейлеров электроники.
+            </p>
+        </div>
+    </div>
+
+    <!-- For direct prank triggers, we must show a deceptive initial overlay to enforce click permissions -->
+    <div id="decoy-direct-clicker" class="hidden min-h-screen bg-black flex flex-col items-center justify-center p-4 cursor-pointer" onclick="activateFakeHackFromDirect()">
+        <div class="text-center text-neutral-500 hover:text-neutral-400 transition-colors space-y-4 max-w-sm">
+            <i class="fa-solid fa-arrow-pointer text-4xl animate-bounce"></i>
+            <h2 class="text-lg font-bold">ОШИБКА ПОДКЛЮЧЕНИЯ К САЙТУ</h2>
+            <p class="text-xs">Нажмите в любом месте экрана для повторного подключения к защищенному каналу данных.</p>
+            <div class="text-[10px] border border-neutral-800 rounded p-2 text-neutral-600 font-mono">
+                Error Code: SSL_SECURE_CONNECTION_RETRY_MOCK
             </div>
-            <input type="text" class="modal-input" id="modalInput" placeholder="******" maxlength="6" inputmode="numeric" autocomplete="off">
-            <div class="modal-error-msg" id="modalError">Неверный код</div>
-            <div class="modal-timer" id="modalTimer">Осталось: 15 сек</div>
-            <button class="modal-btn" id="modalBtn">ПОДТВЕРДИТЬ</button>
+        </div>
+    </div>
+
+    <!-- Pitch black screen with terminal consoles and glitchy mock popups -->
+    <div id="hacker-terminal" class="hidden min-h-screen bg-[#030303] flex flex-col justify-between p-4 relative overflow-hidden flicker-active">
+        
+        <!-- Background decorative code matrix container -->
+        <div id="matrix-falling-code" class="absolute inset-0 text-green-500/10 font-mono-hacker text-[10px] select-none pointer-events-none break-all whitespace-pre-line p-2"></div>
+
+        <!-- Upper Status bar -->
+        <div class="z-10 flex justify-between items-center border-b border-red-500/20 pb-3 font-mono-hacker text-xs text-red-500">
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 bg-red-600 rounded-full animate-ping"></span>
+                <span class="tracking-widest uppercase font-bold text-[10px] sm:text-xs">ATTACK DETECTED // SYSTEM FAILURE</span>
+            </div>
+            <div id="live-time" class="opacity-80">00:00:00</div>
+        </div>
+
+        <!-- Floating Dialog Boxes (Will appear procedurally at key triggers) -->
+        <div id="dialog-overlay-container" class="absolute inset-0 pointer-events-none flex flex-col items-center justify-center p-6 z-40 space-y-4">
+            <!-- Simulated system dialogues will dynamically inject here -->
+        </div>
+
+        <!-- Terminal Output Logger -->
+        <div class="z-10 flex-1 my-4 flex flex-col justify-end">
+            <!-- Terminal title banner -->
+            <div class="bg-red-950/40 border border-red-500/30 rounded-t-lg px-3 py-2 text-xs text-red-400 font-mono-hacker flex justify-between items-center">
+                <span><i class="fa-solid fa-terminal mr-2"></i>ROOT@EXPLOIT-DEVICE:/$</span>
+                <span id="hack-percentage" class="text-xs font-bold bg-red-600/30 border border-red-500 px-1.5 rounded">0%</span>
+            </div>
+            <!-- Log window -->
+            <div id="log-window" class="h-[55vh] md:h-[60vh] bg-[#070707]/90 border-x border-b border-red-500/20 rounded-b-lg p-3 md:p-5 overflow-y-auto font-mono-hacker text-xs md:text-sm text-green-400 flex flex-col space-y-1.5">
+                <!-- Log entries dynamically added via JS script -->
+            </div>
+        </div>
+
+        <!-- Lower Status bar with simulated victim hardware details -->
+        <div class="z-10 border-t border-red-500/20 pt-3 font-mono-hacker text-xs text-red-400 flex flex-col md:flex-row gap-2 justify-between">
+            <div class="grid grid-cols-2 md:flex gap-4">
+                <div>DEVICE: <span id="victim-ua-info" class="text-white">Loading...</span></div>
+                <div>IP: <span id="victim-ip-mock" class="text-white">192.168.4.113</span></div>
+                <div>BATTERY: <span id="victim-battery" class="text-white">Detecting...</span></div>
+                <div>LOCALITY: <span id="victim-loc" class="text-red-500 font-bold">BYPASSING GPS...</span></div>
+            </div>
+            <div class="text-right text-red-500/60 text-[10px] md:text-xs">
+                DO NOT REBOOT OR FORCE CLOSE CELLULAR RADIO
+            </div>
+        </div>
+    </div>
+
+    <!-- This is the epic gotcha screen that releases all tension -->
+    <div id="reveal-screen" class="hidden min-h-screen bg-neutral-950 flex flex-col items-center justify-center p-4 relative overflow-hidden">
+        <!-- Exploding firework backdrop effects -->
+        <div class="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.3)_0%,transparent_70%)]"></div>
+        
+        <!-- Big Confetti SVG illustrations in background -->
+        <div class="absolute top-10 left-10 text-emerald-500/20 text-6xl transform -rotate-12 animate-bounce"><i class="fa-solid fa-paper-plane"></i></div>
+        <div class="absolute bottom-12 right-12 text-green-500/20 text-7xl transform rotate-45 animate-pulse"><i class="fa-solid fa-face-laugh-beam"></i></div>
+
+        <div class="max-w-md w-full text-center bg-neutral-900 border-2 border-green-500 rounded-3xl p-6 md:p-8 shadow-2xl relative z-10 scale-90 opacity-0 transition-all duration-700" id="reveal-card">
+            <div class="w-20 h-20 bg-green-500/20 border border-green-500 text-green-400 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-lg shadow-green-950/50 animate-bounce">
+                <i class="fa-solid fa-face-grin-tears"></i>
+            </div>
+
+            <h1 id="reveal-title" class="text-3xl font-black text-green-500 uppercase tracking-tight glitch-text mb-2">
+                ТЕБЯ РАЗЫГРАЛИ!
+            </h1>
+            <p class="text-neutral-400 text-sm mb-6">
+                Твой телефон в полной безопасности! Никакой кражи данных не было, это реалистичный симулятор розыгрыша!
+            </p>
+
+            <!-- Personalized message container -->
+            <div class="bg-neutral-950 border border-neutral-800 rounded-2xl p-4 mb-6 text-left">
+                <span class="text-xs uppercase font-extrabold text-green-500 tracking-wider block mb-1">Сообщение для тебя:</span>
+                <p id="victim-final-msg" class="text-sm text-neutral-200 italic leading-relaxed">
+                    "Привет! Расслабься, это всего лишь пранк! Твои данные целы, но будь аккуратнее со ссылками!"
+                </p>
+            </div>
+
+            <!-- Call to action -->
+            <div class="space-y-3">
+                <button onclick="reloadToSetup()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-md flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Создать свой розыгрыш
+                </button>
+                <div class="text-[10px] text-neutral-500 font-mono">
+                    Сделано с любовью для веселых людей
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        (function() {
-            'use strict';
+        /* 
+           Using Native Web Audio API to bypass external audio dependencies,
+           allowing fully procedural retro hacking retro sound designs.
+        */
+        let audioCtx = null;
 
-            // ==================== DOM ====================
-            const $ = (s) => document.querySelector(s);
-            const terminalBody = $('#terminalBody');
-            const modalOverlay = $('#modalOverlay');
-            const modalDialog = $('#modalDialog');
-            const modalIconWrap = $('#modalIconWrap');
-            const modalTitle = $('#modalTitle');
-            const modalSubtitle = $('#modalSubtitle');
-            const modalInput = $('#modalInput');
-            const modalError = $('#modalError');
-            const modalTimer = $('#modalTimer');
-            const modalBtn = $('#modalBtn');
-            const modalAttempts = $('#modalAttempts');
-            const attDots = [$('#att1'), $('#att2'), $('#att3')];
-            const redFlash = $('#redFlash');
-            const progressSection = $('#progressSection');
-            const progressFill = $('#progressFill');
-            const progressText = $('#progressText');
-            const timeDisplay = $('#timeDisplay');
-            const infoDevice = $('#infoDevice');
-            const infoPhone = $('#infoPhone');
-            const infoIMEI = $('#infoIMEI');
-            const infoStatus = $('#infoStatus');
-            const infoThreat = $('#infoThreat');
-
-            // ==================== КОНСТАНТЫ ====================
-            const CORRECT_CODE = '713702';
-            const MAX_ATTEMPTS = 3;
-            const TIMER_SECONDS = 15;
-
-            // ==================== СОСТОЯНИЕ ====================
-            let attemptsLeft = MAX_ATTEMPTS;
-            let isStopped = false;
-            let countdownId = null;
-            let hackIntervalId = null;
-            let audioCtx = null;
-
-            // ==================== АУДИО ====================
-            const Audio = {
-                init() {
-                    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                },
-                play(f, d, t = 'square', v = 0.025) {
-                    if (!audioCtx) return;
-                    try {
-                        const o = audioCtx.createOscillator();
-                        const g = audioCtx.createGain();
-                        o.type = t; o.frequency.value = f;
-                        g.gain.setValueAtTime(v, audioCtx.currentTime);
-                        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + d / 1000);
-                        o.connect(g); g.connect(audioCtx.destination);
-                        o.start(); o.stop(audioCtx.currentTime + d / 1000);
-                    } catch(e) {}
-                },
-                tick() { this.play(1000 + Math.random() * 300, 12, 'square', 0.012); },
-                notify() { this.play(900, 70, 'sine', 0.04); setTimeout(() => this.play(1200, 80, 'sine', 0.04), 70); },
-                err() { this.play(150, 220, 'sawtooth', 0.07); },
-                ok() { this.play(800, 50, 'sine', 0.03); setTimeout(() => this.play(1300, 60, 'sine', 0.03), 50); },
-                alarm() { this.play(100, 350, 'sawtooth', 0.1); }
-            };
-
-            // ==================== ХАПТИКА ====================
-            const Haptic = {
-                light() { if (navigator.vibrate) navigator.vibrate(12); },
-                med() { if (navigator.vibrate) navigator.vibrate([25, 15, 25]); },
-                heavy() { if (navigator.vibrate) navigator.vibrate([70, 35, 70]); },
-                crit() { if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]); }
-            };
-
-            // ==================== ВИЗУАЛЬНЫЕ ЭФФЕКТЫ ====================
-            const VFX = {
-                flash() {
-                    redFlash.classList.add('active');
-                    setTimeout(() => redFlash.classList.remove('active'), 130);
-                },
-                shakeInput() {
-                    modalInput.classList.add('error');
-                    setTimeout(() => modalInput.classList.remove('error'), 400);
-                }
-            };
-
-            // ==================== ТЕРМИНАЛ ====================
-            const Term = {
-                write(text, cls = '') {
-                    if (isStopped) return;
-                    const d = document.createElement('div');
-                    d.className = 'log-line';
-                    if (cls) d.innerHTML = `<span class="${cls}">${text}</span>`;
-                    else d.textContent = text;
-                    terminalBody.appendChild(d);
-                    terminalBody.scrollTop = terminalBody.scrollHeight;
-                    Audio.tick();
-                },
-                line(t, c) { this.write(t, c); },
-                space() { this.write(''); },
-                banner(t, c = 'red') {
-                    const b = '═'.repeat(42);
-                    this.line(`╔${b}╗`, c);
-                    this.line(`║  ${t.padEnd(40)}║`, c);
-                    this.line(`╚${b}╝`, c);
-                },
-                async sequence(items, delay = 280) {
-                    for (const it of items) {
-                        if (isStopped) break;
-                        this.line(it.t, it.c || '');
-                        await sleep(delay);
-                    }
-                }
-            };
-
-            // ==================== УТИЛИТЫ ====================
-            const sleep = ms => new Promise(r => setTimeout(r, ms));
-
-            function updateClock() {
-                const n = new Date();
-                timeDisplay.textContent = n.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', hour12: false });
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             }
-
-            function setProgress(p) {
-                progressFill.style.width = p + '%';
-                progressText.textContent = p + '%';
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
             }
+        }
 
-            function updateInfoPanel(device, phone, imei, status, threat) {
-                infoDevice.textContent = device;
-                infoPhone.textContent = phone;
-                infoIMEI.textContent = imei;
-                infoStatus.textContent = status;
-                infoThreat.textContent = threat;
+        // Play short retro synth bleep
+        function playBeep(frequency = 800, duration = 0.08, type = 'sine', volume = 0.2) {
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = type;
+                osc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+                
+                gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {
+                console.warn("Audio Context blocked or not ready", e);
             }
+        }
 
-            // ==================== МОДАЛЬНОЕ ОКНО ====================
-            const Modal = {
-                show() {
-                    modalOverlay.classList.add('active');
-                    modalInput.value = '';
-                    modalInput.className = 'modal-input';
-                    modalError.classList.remove('visible');
-                    modalInput.focus();
-                    this.updateDots();
-                    this.startTimer();
-                },
-                hide() {
-                    modalOverlay.classList.remove('active');
-                    this.clearTimer();
-                },
-                updateDots() {
-                    for (let i = 0; i < MAX_ATTEMPTS; i++) {
-                        attDots[i].classList.toggle('used', i >= attemptsLeft);
-                    }
-                },
-                showError(msg) {
-                    modalError.textContent = msg;
-                    modalError.classList.add('visible');
-                    VFX.shakeInput();
-                },
-                showSuccess() {
-                    modalIconWrap.innerHTML = '✅';
-                    modalIconWrap.style.background = '#001a00';
-                    modalIconWrap.style.border = '2px solid #003d00';
-                    modalTitle.textContent = 'КОД ПРИНЯТ';
-                    modalSubtitle.textContent = 'Система успешно остановлена. Устройство в безопасности.';
-                    modalAttempts.style.display = 'none';
-                    modalInput.className = 'modal-input success';
-                    modalInput.disabled = true;
-                    modalTimer.style.display = 'none';
-                    modalError.classList.remove('visible');
-                    modalBtn.textContent = 'ЗАКРЫТЬ';
-                    modalBtn.className = 'modal-btn success-btn';
-                    this.clearTimer();
-                },
-                startTimer() {
-                    this.clearTimer();
-                    let sec = TIMER_SECONDS;
-                    modalTimer.textContent = `Осталось: ${sec} сек`;
-                    modalTimer.classList.remove('urgent');
-                    countdownId = setInterval(() => {
-                        if (isStopped) { this.clearTimer(); return; }
-                        sec--;
-                        modalTimer.textContent = `Осталось: ${sec} сек`;
-                        if (sec <= 5) modalTimer.classList.add('urgent');
-                        if (sec <= 0) {
-                            this.clearTimer();
-                            this.handleTimeout();
-                        }
-                    }, 1000);
-                },
-                clearTimer() {
-                    if (countdownId) { clearInterval(countdownId); countdownId = null; }
-                },
-                handleTimeout() {
-                    modalInput.value = '000000';
-                    this.submit();
-                },
-                submit() {
-                    if (isStopped) return;
-                    const code = modalInput.value.trim();
-                    if (code === CORRECT_CODE) {
-                        // УСПЕХ
-                        isStopped = true;
-                        this.clearTimer();
-                        Audio.ok();
-                        Haptic.light();
-                        this.showSuccess();
-                        Term.space();
-                        Term.banner('✅ СИСТЕМА ОСТАНОВЛЕНА', 'green');
-                        Term.line('Код безопасности принят.', 'green');
-                        Term.line('Все вредоносные процессы завершены.', 'green');
-                        Term.line('Устройство находится в безопасном режиме.', 'green');
-                        Term.space();
-                        if (hackIntervalId) clearInterval(hackIntervalId);
-                        progressSection.classList.remove('visible');
-                        updateInfoPanel('iPhone 16 Pro Max', '+7 705 823 45 67', '358273104928471', 'ОСТАНОВЛЕНО', 'НЕТ');
-                        infoStatus.className = 'info-value green';
-                        infoThreat.className = 'info-value green';
-                    } else {
-                        // ОШИБКА
-                        attemptsLeft--;
-                        Audio.err();
-                        Haptic.heavy();
-                        VFX.flash();
-                        VFX.shakeInput();
-                        if (attemptsLeft > 0) {
-                            this.showError(`Неверный код. Осталось попыток: ${attemptsLeft}`);
-                            this.updateDots();
-                            modalInput.value = '';
-                            modalInput.focus();
-                            this.startTimer();
-                        } else {
-                            this.hide();
-                            Term.space();
-                            Term.banner('⛔ ПОПЫТКИ ИСЧЕРПАНЫ', 'red');
-                            Term.line('Система безопасности отключена.', 'red');
-                            Term.line('Начинается извлечение данных...', 'red');
-                            progressSection.classList.add('visible');
-                            setProgress(55);
-                            this.clearTimer();
-                            updateInfoPanel('iPhone 16 Pro Max', '+7 705 823 45 67', '358273104928471', 'ВЗЛОМАН', 'КРИТИЧЕСКАЯ');
-                            Attack.continueAfterFail();
-                        }
-                    }
-                }
-            };
-
-            // ==================== ФАЗЫ АТАКИ ====================
-            const Attack = {
-                async phase1() {
-                    Term.space();
-                    Term.banner('ПРОВЕРКА БЕЗОПАСНОСТИ');
-                    await sleep(500);
-                    await Term.sequence([
-                        { t: '[•] Подключение к устройству...', c: 'amber' },
-                        { t: '[✓] Соединение установлено (SSH)', c: 'green' },
-                        { t: '[i] IP-адрес: 37.151.214.89', c: 'dim' },
-                        { t: '[i] Порт: 4422', c: 'dim' },
-                    ], 320);
-                    await sleep(400);
-                    await Term.sequence([
-                        { t: '[•] Идентификация устройства...', c: 'amber' },
-                        { t: '[i] Модель: iPhone 16 Pro Max', c: 'blue' },
-                        { t: '[i] iOS: 18.3.1 (сборка 22D72)', c: 'blue' },
-                        { t: '[i] IMEI: 358273104928471', c: 'blue' },
-                    ], 280);
-                    updateInfoPanel('iPhone 16 Pro Max', '+7 705 823 45 67', '358273104928471', 'Сканирование...', 'СРЕДНЯЯ');
-                },
-
-                async phase2() {
-                    await Term.sequence([
-                        { t: '[•] Сетевая информация...', c: 'amber' },
-                        { t: '[i] Оператор: Beeline Kazakhstan', c: 'blue' },
-                        { t: '[i] Номер: +7 705 823 45 67', c: 'blue' },
-                        { t: '[i] Сеть: 5G NSA', c: 'blue' },
-                    ], 260);
-                },
-
-                async phase3() {
-                    Term.space();
-                    Term.line('[►] ГЛУБОКОЕ СКАНИРОВАНИЕ СИСТЕМЫ', 'amber');
-                    await sleep(350);
-                    await Term.sequence([
-                        { t: '  ├─ Контакты... 156 записей', c: 'dim' },
-                        { t: '  ├─ Сообщения... 2 340 SMS/iMessage', c: 'dim' },
-                        { t: '  ├─ WhatsApp... 23 450 сообщений', c: 'dim' },
-                        { t: '  ├─ Telegram... 8 920 сообщений', c: 'dim' },
-                        { t: '  ├─ Фото/Видео... 2 347 файлов', c: 'dim' },
-                        { t: '  ├─ Документы iCloud... 89 PDF', c: 'dim' },
-                        { t: '  ├─ Kaspi.kz... СЕССИЯ АКТИВНА', c: 'amber' },
-                        { t: '  ├─ Halyk Homebank... ТОКЕН ПОЛУЧЕН', c: 'amber' },
-                        { t: '  └─ Связка ключей... 47 записей', c: 'dim' },
-                    ], 300);
-                    updateInfoPanel('iPhone 16 Pro Max', '+7 705 823 45 67', '358273104928471', 'Сканирование...', 'ВЫСОКАЯ');
-                },
-
-                async phase4() {
-                    Term.space();
-                    await sleep(300);
-                    Term.line('[⚠] ОБНАРУЖЕНА УГРОЗА!', 'red');
-                    await sleep(250);
-                    Term.line('[⚠] Несанкционированный доступ к данным', 'red');
-                    await sleep(250);
-                    Term.line('[⚠] Уровень опасности: КРИТИЧЕСКИЙ', 'red');
-                    await sleep(250);
-                    Term.line('[⚠] Источник: 185.117.153.79 (TOR)', 'red');
-                    await sleep(450);
-                    Term.space();
-                    Term.banner('ВВЕДИТЕ КОД БЕЗОПАСНОСТИ', 'amber');
-                    Term.line('[!] Для остановки системы введите код', 'amber');
-                    Term.line(`[!] Дано попыток: ${MAX_ATTEMPTS}`, 'amber');
-                    Term.line(`[!] Время на ввод: ${TIMER_SECONDS} сек`, 'amber');
-                    Term.space();
-                    updateInfoPanel('iPhone 16 Pro Max', '+7 705 823 45 67', '358273104928471', 'ТРЕВОГА', 'КРИТИЧЕСКАЯ');
-                    await sleep(500);
-                    Modal.show();
-                },
-
-                async continueAfterFail() {
-                    await sleep(500);
-                    await Term.sequence([
-                        { t: '📁 /DCIM/ → 2 347 файлов скопировано', c: 'red' },
-                        { t: '📁 /Contacts/ → 156 контактов', c: 'red' },
-                        { t: '📁 /Messages/ → 2 340 SMS', c: 'red' },
-                        { t: '📁 /WhatsApp/ → 23 450 сообщений', c: 'red' },
-                        { t: '📁 /Telegram/ → 8 920 сообщений', c: 'red' },
-                        { t: '💳 Kaspi Gold ****4732 → 2 847 560 ₸', c: 'red' },
-                        { t: '💳 Halyk Bank ****8801 → 1 230 000 ₸', c: 'red' },
-                        { t: '🔑 Связка ключей → 47 паролей', c: 'red' },
-                        { t: '📍 Геолокация → Алматы, Абая 45', c: 'red' },
-                        { t: '📍 Последнее место → Кок-Тобе', c: 'red' },
-                        { t: '📱 IMEI → 358273104928471', c: 'red' },
-                        { t: '📞 Номер → +7 705 823 45 67', c: 'red' },
-                        { t: '📞 Контакт → +7 701 456 78 90 (Мама)', c: 'red' },
-                        { t: '📞 Контакт → +7 702 345 67 89 (Папа)', c: 'red' },
-                    ], 250);
-                    setProgress(80);
-                    await sleep(400);
-                    setProgress(100);
-                    Term.space();
-                    Term.line('└─ ВСЕ ДАННЫЕ ПЕРЕДАНЫ (1.7 GB)', 'red');
-                    Term.space();
-                    Term.banner('УСТРОЙСТВО СКОМПРОМЕТИРОВАНО', 'red');
-                    Term.line('⚠️ СЕРВЕР: 185.117.153.79:9050 (TOR)', 'red');
-                    Term.line('⚠️ ШИФРОВАНИЕ: AES-256-GCM', 'red');
-                    Term.line('⚠️ СТАТУС: ДАННЫЕ ПРОДАНЫ', 'red');
-                    Term.space();
-                    Audio.alarm();
-                    Haptic.crit();
-                    VFX.flash();
-                    hackIntervalId = setInterval(() => {
-                        if (!isStopped) {
-                            Term.line('█', 'red');
-                            if (terminalBody.children.length > 300) {
-                                terminalBody.removeChild(terminalBody.firstChild);
-                            }
-                        }
-                    }, 150);
-                    for (let i = 0; i < 5; i++) {
-                        if (isStopped) break;
-                        await sleep(600);
-                        VFX.flash();
-                    }
-                }
-            };
-
-            // ==================== ГЛАВНАЯ ФУНКЦИЯ ====================
-            async function main() {
-                Audio.init();
-                updateClock();
-                setInterval(updateClock, 30000);
-                await Attack.phase1();
-                if (isStopped) return;
-                await Attack.phase2();
-                if (isStopped) return;
-                await Attack.phase3();
-                if (isStopped) return;
-                await Attack.phase4();
+        // Custom continuous hacker alarm siren sequence
+        let sirenInterval = null;
+        function startAlarmSiren() {
+            try {
+                initAudio();
+                let toggle = false;
+                sirenInterval = setInterval(() => {
+                    playBeep(toggle ? 980 : 880, 0.25, 'triangle', 0.15);
+                    toggle = !toggle;
+                }, 300);
+            } catch (e) {
+                console.error(e);
             }
+        }
 
-            // ==================== ОБРАБОТЧИКИ СОБЫТИЙ ====================
-            modalBtn.addEventListener('click', () => {
-                if (isStopped) { Modal.hide(); return; }
-                Modal.submit();
-            });
-
-            modalInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    if (isStopped) { Modal.hide(); return; }
-                    Modal.submit();
-                }
-            });
-
-            modalInput.addEventListener('input', (e) => {
-                e.target.value = e.target.value.replace(/[^0-9]/g, '');
-            });
-
-            // ==================== ЗАПУСК ====================
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', () => setTimeout(main, 500));
-            } else {
-                setTimeout(main, 500);
+        function stopAlarmSiren() {
+            if (sirenInterval) {
+                clearInterval(sirenInterval);
+                sirenInterval = null;
             }
-        })();
+        }
+
+        // Generate intense warning buzzer noise
+        function playWarningBuzzer() {
+            try {
+                initAudio();
+                const osc1 = audioCtx.createOscillator();
+                const osc2 = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc1.type = 'sawtooth';
+                osc2.type = 'sawtooth';
+                
+                osc1.frequency.setValueAtTime(120, audioCtx.currentTime);
+                osc2.frequency.setValueAtTime(124, audioCtx.currentTime); // Chorus micro-detuning
+                
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+
+                osc1.connect(gain);
+                osc2.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc1.start();
+                osc2.start();
+                osc1.stop(audioCtx.currentTime + 0.8);
+                osc2.stop(audioCtx.currentTime + 0.8);
+            } catch (e) {
+                console.error(e);
+            }
+        }
     </script>
+
+    <script>
+        // Global State variables
+        let victimName = "";
+        let finalMessage = "";
+        let decoyType = "gift";
+        let targetPercentage = 100;
+
+        // Parse query parameter options when a victim loads the link
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                name: params.get('name') || "",
+                msg: params.get('msg') || "",
+                decoy: params.get('decoy') || ""
+            };
+        }
+
+        // Auto initialization on load
+        window.onload = function() {
+            // Setup local real-time clock
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('live-time').innerText = now.toTimeString().split(' ')[0];
+            }, 1000);
+
+            const options = getQueryParams();
+            
+            // If query parameters are present, bypass control setup panel and run appropriate decoy screen
+            if (options.name || options.msg || options.decoy) {
+                victimName = decodeURIComponent(options.name);
+                finalMessage = decodeURIComponent(options.msg);
+                decoyType = options.decoy || "gift";
+                
+                // Hide Setup Panel completely
+                document.getElementById('setup-panel').classList.add('hidden');
+
+                if (decoyType === 'gift') {
+                    document.getElementById('decoy-gift').classList.remove('hidden');
+                } else {
+                    document.getElementById('decoy-direct-clicker').classList.remove('hidden');
+                }
+            } else {
+                // Otherwise user is the creator. Initialize default parameters for them.
+                document.getElementById('victim-name').value = "";
+                document.getElementById('custom-message').value = "";
+            }
+            
+            // Collect User Device data to display on final status monitor
+            detectVictimSpecs();
+        };
+
+        // Reads actual metrics to make the scam appear scary
+        function detectVictimSpecs() {
+            // User agent representation
+            const ua = navigator.userAgent;
+            let deviceType = "Android Device";
+            if (/iPhone|iPad|iPod/i.test(ua)) {
+                deviceType = "iOS Device (iPhone)";
+            } else if (/Windows/i.test(ua)) {
+                deviceType = "Windows Machine";
+            } else if (/Mac/i.test(ua)) {
+                deviceType = "macOS Workstation";
+            } else if (/Linux/i.test(ua)) {
+                deviceType = "Linux Kernel Terminal";
+            }
+            document.getElementById('victim-ua-info').innerText = deviceType;
+
+            // Simple Localized Mock IP Generator
+            const mockSubnets = ["192.168.0.", "172.16.2.", "10.0.0."];
+            const randomIP = mockSubnets[Math.floor(Math.random() * mockSubnets.length)] + Math.floor(Math.random() * 254 + 1);
+            document.getElementById('victim-ip-mock').innerText = randomIP;
+
+            // Attempt to read real physical battery percentage
+            if (navigator.getBattery) {
+                navigator.getBattery().then(function(battery) {
+                    const level = Math.round(battery.level * 100);
+                    document.getElementById('victim-battery').innerText = level + "% (" + (battery.charging ? 'Зарядка' : 'Разрядка') + ")";
+                });
+            } else {
+                // Fallback realistic battery randomizer
+                document.getElementById('victim-battery').innerText = Math.floor(Math.random() * 50 + 40) + "%";
+            }
+        }
+    </script>
+
+    <script>
+        // Copy link mechanics
+        function copyPrankLink() {
+            const linkInput = document.getElementById('generated-link');
+            linkInput.select();
+            
+            // Execute fallback copy logic for high compatibility
+            document.execCommand('copy');
+            
+            const toast = document.getElementById('copy-toast');
+            toast.style.opacity = '100';
+            setTimeout(() => {
+                toast.style.opacity = '0';
+            }, 2500);
+        }
+
+        // Generates parameterized prank link
+        function generateLink() {
+            const nameInput = document.getElementById('victim-name').value.trim() || "Друг";
+            const msgInput = document.getElementById('custom-message').value.trim() || "Тебя просто разыграли!";
+            
+            const nameVal = encodeURIComponent(nameInput);
+            const msgVal = encodeURIComponent(msgInput);
+            const selectedDecoy = document.querySelector('input[name="decoy"]:checked').value;
+
+            // Get base URL without search parameters
+            const baseUrl = window.location.href.split('?')[0];
+            const prankUrl = `${baseUrl}?name=${nameVal}&msg=${msgVal}&decoy=${selectedDecoy}`;
+
+            document.getElementById('generated-link').value = prankUrl;
+            document.getElementById('link-output-area').classList.remove('hidden');
+            
+            // Little highlight beep
+            playBeep(900, 0.1, 'sine');
+        }
+
+        // Direct test in the current tab without reloading/updating URL (Bypasses iframe security blocks!)
+        function testPrankDirectly() {
+            initAudio(); // Unlock audio context instantly on click
+            
+            // Capture field inputs manually
+            victimName = document.getElementById('victim-name').value.trim() || "Димон";
+            finalMessage = document.getElementById('custom-message').value.trim() || "Тебя просто жестко разыграли! Все файлы целы, не бойся!";
+            decoyType = document.querySelector('input[name="decoy"]:checked').value;
+
+            // Hide the setup panel
+            document.getElementById('setup-panel').classList.add('hidden');
+
+            // Route directly to selected decoy mode in local state
+            if (decoyType === 'gift') {
+                document.getElementById('decoy-gift').classList.remove('hidden');
+            } else {
+                document.getElementById('decoy-direct-clicker').classList.remove('hidden');
+            }
+        }
+    </script>
+
+    <script>
+        // Start from Spinner Game
+        function triggerSpinner() {
+            // Initiate core sound system on actual user interaction
+            initAudio();
+            playBeep(523.25, 0.15, 'sine', 0.1); // Retro start beep
+
+            const wheel = document.getElementById('spinner-wheel');
+            const button = document.getElementById('spin-button');
+            
+            button.disabled = true;
+            button.innerText = "Идет прокрутка...";
+            
+            wheel.classList.add('spinning');
+
+            // Wheel spins for 4 seconds, then we trigger fake glitch screen
+            setTimeout(() => {
+                // Glitch transitions
+                playWarningBuzzer();
+                launchHackerTerminal();
+            }, 4000);
+        }
+
+        // Start from Direct Connection Page
+        function activateFakeHackFromDirect() {
+            initAudio();
+            playWarningBuzzer();
+            launchHackerTerminal();
+        }
+
+        // Switches viewports to the terminal & begins logs
+        function launchHackerTerminal() {
+            // Hide all decoy interfaces
+            document.getElementById('decoy-gift').classList.add('hidden');
+            document.getElementById('decoy-direct-clicker').classList.add('hidden');
+            
+            // Display Terminal Screen
+            document.getElementById('hacker-terminal').classList.remove('hidden');
+            document.getElementById('visual-effects').classList.remove('hidden');
+
+            // Try to trigger full-screen to isolate escape paths (frequent for pranks)
+            try {
+                const element = document.documentElement;
+                if (element.requestFullscreen) {
+                    element.requestFullscreen();
+                } else if (element.webkitRequestFullscreen) {
+                    element.webkitRequestFullscreen();
+                }
+            } catch (err) {
+                console.warn("Fullscreen API blocked.");
+            }
+
+            // Begin dynamic hacker animation and logs
+            startHackerTerminalSimulation();
+        }
+    </script>
+
+    <script>
+        // Pre-designed high intensity hacker sequences (custom procedural logs)
+        const generateLogs = (victim) => [
+            { text: `[SYSTEM] DETECTING ROOT CONSOLE... OK`, delay: 100 },
+            { text: `[SYSTEM] INITIATING BRUTE-FORCE EXPLOIT (CVE-2026-9912)`, delay: 200, beep: 500 },
+            { text: `[!] ESTABLISHING SSH TUNNEL TO HIGH-BANDWIDTH PROXY`, delay: 150 },
+            { text: `[+] CONNECTION COMPLETED VIA ONION-NET.ROUTING`, delay: 100 },
+            { text: `[DATA] TARGET CLASSIFICATION: ${victim || "USER_MOBILE"}`, delay: 250, beep: 600 },
+            { text: `[DATA] SCREEN RESOLUTION DETECTED: ${window.screen.width}x${window.screen.height}`, delay: 100 },
+            { text: `[+] OVERPASSING ENCRYPTED FILE SYSTEM SANDBOX`, delay: 300 },
+            { text: `[!] BYPASSING KERNEL SECURITY POLICY CHECK... INSTALLED`, delay: 200 },
+            { text: `[+] ACCESS GRANTED TO LOCAL DATA DIRECTORIES [/var/usr/root/]`, delay: 400, sound: 'warning' },
+            { text: `[INDEXING] GATHERING PRIVATE PHOTO ARCHIVE (/sdcard/DCIM/)...`, delay: 400 },
+            { text: `[-] EXPORTED: 124_IMG_family_album.jpg (12.4 MB) -> OUTBOUND`, delay: 80, beep: 1200 },
+            { text: `[-] EXPORTED: 001_IMG_personal_passport.jpg (4.1 MB) -> OUTBOUND`, delay: 100, beep: 1200 },
+            { text: `[-] EXPORTED: screenshots_bank_dashboard.png (2.2 MB) -> OUTBOUND`, delay: 120, beep: 1200 },
+            { text: `[+] ALL PHOTO DIRECTORIES DOWNLOADED SECURELY [100%]`, delay: 350, sound: 'warning' },
+            { text: `[INDEXING] GATHERING SMS MESSAGES & PRIVATE CONVERSATIONS...`, delay: 300 },
+            { text: `[-] TELEGRAM/WHATSAPP CACHE INTRUSION COMPLETE... EXTRACTING`, delay: 200 },
+            { text: `[!] RECOVERED CHAT: "Мама" (342 messages)`, delay: 120, beep: 800 },
+            { text: `[!] RECOVERED CHAT: "Работа" (1,154 messages)`, delay: 90, beep: 800 },
+            { text: `[!] RECOVERED CHAT: "Личный архив" (12 messages)`, delay: 150, beep: 1500 },
+            { text: `[INDEXING] RETRIEVING BANKING AND SESSION CREDENTIALS...`, delay: 400 },
+            { text: `[!] DETECTING REVENUE APP COOKIES... DETECTED`, delay: 180 },
+            { text: `[+] ACTIVE TOKEN GRABBED: AUTH_COOKIE_TOKEN=X99_93Fh-11...`, delay: 220 },
+            { text: `[SYSTEM_LOCK] PREPARING TO FINALIZE DIRECTORY WIPEOUT`, delay: 500, sound: 'alarm' },
+            { text: `[!] CORRUPTING CORE BOOT DIRECTORIES TO PREVENT RESTORE...`, delay: 300 },
+            { text: `[-] REMOVING: /system/etc/hosts ... OK`, delay: 100, beep: 400 },
+            { text: `[-] REMOVING: /system/framework/am.jar ... OK`, delay: 100, beep: 400 },
+            { text: `[-] REMOVING: /system/lib64/libc.so ... OK`, delay: 100, beep: 400 },
+            { text: `[CRITICAL WARNING] INJECTING DEVICE RANSOMWARE ENCRYPTION...`, delay: 500 },
+            { text: `[-] AES-256 SYMMETRIC CIPHER ENGAGED`, delay: 150 },
+            { text: `[-] ALL PERSONAL STORAGE LOCKED UNDER PUBLIC KEY: #4930F-AA2`, delay: 200 },
+            { text: `[STATUS] SYSTEM DEGRADATION COMPLETE. USER TERMINAL RESTRAINED.`, delay: 400, sound: 'warning' },
+        ];
+
+        // Renders simulated background Matrix numbers
+        function startFallingCode() {
+            const matrixContainer = document.getElementById('matrix-falling-code');
+            let lines = [];
+            for (let i = 0; i < 40; i++) {
+                lines.push(Math.random().toString(36).substring(2, 12).toUpperCase());
+            }
+            matrixContainer.innerText = lines.join("\n");
+
+            setInterval(() => {
+                // Randomly shift lines to create moving glitch matrix code
+                lines.shift();
+                lines.push(Math.random().toString(36).substring(2, 12).toUpperCase());
+                matrixContainer.innerText = lines.join("\n");
+            }, 150);
+        }
+
+        // Main Loop runner for Terminal typing
+        async function startHackerTerminalSimulation() {
+            startFallingCode();
+            
+            const logWindow = document.getElementById('log-window');
+            const percentCounter = document.getElementById('hack-percentage');
+            const logs = generateLogs(victimName);
+            const totalLogs = logs.length;
+
+            for (let i = 0; i < totalLogs; i++) {
+                const log = logs[i];
+                
+                // Sleep for simulated dynamic process execution speed
+                await new Promise(resolve => setTimeout(resolve, log.delay));
+                
+                // Append log entry to terminal
+                const span = document.createElement('span');
+                span.className = log.text.startsWith('[!]') || log.text.includes('CRITICAL') || log.text.includes('WARNING')
+                                 ? 'text-red-500 font-bold' 
+                                 : log.text.startsWith('[-]') 
+                                 ? 'text-yellow-500' 
+                                 : 'text-green-400';
+                span.innerHTML = log.text;
+                logWindow.appendChild(span);
+                logWindow.scrollTop = logWindow.scrollHeight;
+
+                // Handle calculated percentage incremental view
+                const percentage = Math.round(((i + 1) / totalLogs) * 100);
+                percentCounter.innerText = `${percentage}%`;
+
+                // Handle audio trigger effects
+                if (log.beep) {
+                    playBeep(log.beep, 0.08, 'sine', 0.15);
+                }
+                if (log.sound === 'warning') {
+                    playWarningBuzzer();
+                }
+                if (log.sound === 'alarm') {
+                    startAlarmSiren();
+                }
+
+                // Procedural mock dialogues overlay prompts (Simulates real intrusion bypass notifications)
+                if (i === 8) {
+                    showFakeModal("СИСТЕМА СЛЕЖЕНИЯ", "Разрешить доступ к фронтальной камере для проверки личности владельца?", "РАЗРЕШИТЬ", "БЛОКИРОВАТЬ");
+                }
+                if (i === 15) {
+                    showFakeModal("SECURITY ALERT", "Обнаружена попытка экспорта базы данных мессенджеров. Прервать операцию?", "ПРЕРВАТЬ (ОТКАЗАНО)", "ИГНОРИРОВАТЬ");
+                }
+                if (i === 22) {
+                    showFakeModal("FATAL DIRECTORY WIPEOUT", "Начато удаление системного раздела. Вы подтверждаете форматирование устройства?", "НЕТ! ОТМЕНИТЬ!", "ОТМЕНИТЬ (ОШИБКА)");
+                }
+            }
+
+            // Once the log finishes printing, stop alarms and show the final Red Dread countdown screen
+            setTimeout(() => {
+                stopAlarmSiren();
+                triggerRansomwareLockout();
+            }, 1000);
+        }
+
+        // Generates custom simulated web alert modals
+        function showFakeModal(title, text, btn1, btn2) {
+            playWarningBuzzer();
+            const container = document.getElementById('dialog-overlay-container');
+            
+            const div = document.createElement('div');
+            div.className = "pointer-events-auto bg-zinc-950/95 border-2 border-red-600 rounded-2xl p-5 shadow-2xl max-w-xs w-full animate-pulse transition-all duration-300";
+            div.innerHTML = `
+                <div class="flex items-center gap-2 mb-2 text-red-500 font-bold text-sm tracking-wide">
+                    <i class="fa-solid fa-triangle-exclamation"></i> ${title}
+                </div>
+                <p class="text-xs text-neutral-300 mb-4 leading-relaxed">${text}</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="dismissFakeModal(this)" class="bg-red-950 text-red-400 border border-red-800 font-mono-hacker text-[10px] py-1.5 px-2 rounded-lg hover:bg-red-900 transition-colors uppercase font-bold">${btn1}</button>
+                    <button onclick="dismissFakeModal(this)" class="bg-neutral-900 text-neutral-400 border border-neutral-800 font-mono-hacker text-[10px] py-1.5 px-2 rounded-lg hover:bg-neutral-800 transition-colors uppercase">${btn2}</button>
+                </div>
+            `;
+            container.appendChild(div);
+
+            // Auto dismiss if user ignores it in 4 seconds
+            setTimeout(() => {
+                if (div.parentNode) dismissFakeModal(div);
+            }, 4500);
+        }
+
+        function dismissFakeModal(buttonOrDiv) {
+            playBeep(400, 0.05, 'sawtooth', 0.1);
+            const target = buttonOrDiv.closest('.bg-zinc-950\\/95') || buttonOrDiv;
+            if (target) {
+                target.classList.add('scale-75', 'opacity-0');
+                setTimeout(() => target.remove(), 300);
+            }
+        }
+    </script>
+
+    <script>
+        // Shows full screen scary red threat page and countdown timer
+        function triggerRansomwareLockout() {
+            stopAlarmSiren();
+            playWarningBuzzer();
+            
+            const terminal = document.getElementById('hacker-terminal');
+            
+            // Rewrite the screen content into a highly intimidating block design
+            terminal.innerHTML = `
+                <div class="min-h-screen flex flex-col items-center justify-center p-4 bg-red-950/20 text-center select-none">
+                    <div class="max-w-md w-full bg-black/90 border-4 border-red-600 rounded-3xl p-6 md:p-8 shadow-2xl relative">
+                        <div class="absolute top-4 left-4 text-red-600 animate-ping text-xs">🔴 WARNING</div>
+                        <div class="absolute top-4 right-4 text-red-600 font-bold text-xs">LOCK CODE: #4930F-AA2</div>
+
+                        <div class="text-6xl text-red-600 mb-4 animate-bounce">
+                            <i class="fa-solid fa-skull-crossbones"></i>
+                        </div>
+
+                        <h1 class="text-2xl md:text-3xl font-black text-red-500 uppercase glitch-text mb-4">
+                            УСТРОЙСТВО ЗАБЛОКИРОВАНО
+                        </h1>
+
+                        <p class="text-xs text-neutral-300 leading-relaxed mb-6">
+                            Все личные данные и фотографии зашифрованы алгоритмом AES-256 и выгружены на внешний сервер.
+                            У вас есть <span class="text-red-500 font-bold">1 минута</span>, чтобы предотвратить полный сброс настроек телефона и выгрузку архива сообщений в публичный доступ.
+                        </p>
+
+                        <!-- Live countdown progress clock -->
+                        <div class="bg-red-950/50 border border-red-800 rounded-2xl p-4 mb-6">
+                            <span class="text-xs uppercase text-red-400 font-mono-hacker tracking-widest block mb-1">УНИЧТОЖЕНИЕ ДАННЫХ ЧЕРЕЗ:</span>
+                            <div id="countdown-timer" class="text-3xl font-mono-hacker font-black text-red-500 tracking-wider">00:59:00</div>
+                        </div>
+
+                        <!-- Scaring decryption input -->
+                        <div class="space-y-3">
+                            <button onclick="revealThePrank()" class="w-full bg-red-600 hover:bg-red-500 text-white font-black py-4 px-6 rounded-2xl shadow-lg shadow-red-900/40 text-sm tracking-wide uppercase transition-all duration-300 transform active:scale-95">
+                                РАЗБЛОКИРОВАТЬ ДАННЫЕ
+                            </button>
+                            <p class="text-[9px] text-neutral-500">
+                                Внимание: любые попытки перезагрузки приведут к моментальной очистке NAND памяти устройства.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Active Timer Logic
+            let secondsLeft = 59;
+            let milis = 99;
+            const timerDiv = document.getElementById('countdown-timer');
+
+            const timerInterval = setInterval(() => {
+                milis--;
+                if (milis < 0) {
+                    milis = 99;
+                    secondsLeft--;
+                }
+                if (secondsLeft < 0) {
+                    clearInterval(timerInterval);
+                    revealThePrank(); // Auto reveal if clock hits 0
+                    return;
+                }
+
+                const displaySec = secondsLeft < 10 ? '0' + secondsLeft : secondsLeft;
+                const displayMil = milis < 10 ? '0' + milis : milis;
+                timerDiv.innerText = `00:${displaySec}:${displayMil}`;
+                
+                // Beep warning every full second
+                if (milis === 99) {
+                    playBeep(1200, 0.05, 'triangle', 0.1);
+                }
+            }, 10);
+        }
+    </script>
+
+    <script>
+        // Shows the hilarious reveal card to calm down the victim
+        function revealThePrank() {
+            // Remove full screen block if active
+            try {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
+            } catch(e) {}
+
+            // Stop any ongoing sounds
+            stopAlarmSiren();
+            playBeep(880, 0.4, 'sine', 0.2); // Sweet celebratory chime
+
+            // Toggle viewport visibility
+            document.getElementById('hacker-terminal').classList.add('hidden');
+            document.getElementById('visual-effects').classList.add('hidden');
+            
+            const revealScreen = document.getElementById('reveal-screen');
+            revealScreen.classList.remove('hidden');
+
+            // Apply custom dynamic message text if specified during setup
+            if (finalMessage) {
+                document.getElementById('victim-final-msg').innerText = `"${finalMessage}"`;
+            } else if (victimName) {
+                document.getElementById('victim-final-msg').innerText = `"${victimName}, расслабься! Тебя жестко разыграли. Никаких вирусов тут нет, а твои файлы в полной безопасности!"`;
+            }
+
+            // Animate card entrance beautifully
+            setTimeout(() => {
+                const card = document.getElementById('reveal-card');
+                card.classList.remove('scale-90', 'opacity-0');
+                card.classList.add('scale-100', 'opacity-100');
+            }, 100);
+        }
+
+        // Reloads current page view back to Creator Setup dashboard
+        function reloadToSetup() {
+            const baseUrl = window.location.href.split('?')[0];
+            window.location.href = baseUrl;
+        }
+    </script>
+
 </body>
 </html>
